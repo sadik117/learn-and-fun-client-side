@@ -33,11 +33,11 @@ const PrizeCarousel = () => {
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
             Play & Win Amazing Prizes
           </h2>
-          <p className="text-sm text-gray-600 max-w-2xl mx-auto">
+          <p className="text-md text-gray-600 max-w-2xl mx-auto">
             Turn your learning achievements into lottery tickets. Win cash
             prizes, gadgets, and exclusive rewards.
           </p>
-          <p className="text-xs text-gray-600 max-w-2xl mx-auto mt-2">
+          <p className="text-md text-gray-600 max-w-2xl mx-auto mt-2">
             The more you learn, the more chances you get!
           </p>
         </div>

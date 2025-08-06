@@ -2,6 +2,7 @@ import React from 'react';
 import HeroSection from '../layouts/HeroSection';
 import SkillsSection from '../layouts/SkillsSection';
 import PrizeCarousel from '../layouts/PrizeCarousel';
+import ReferralProgram from '../layouts/ReferralProgram';
 
 const Home = () => {
     return (
@@ -9,6 +10,7 @@ const Home = () => {
             <HeroSection></HeroSection>
             <PrizeCarousel></PrizeCarousel>
             <SkillsSection></SkillsSection>
+            <ReferralProgram></ReferralProgram>
         </div>
     );
 };
