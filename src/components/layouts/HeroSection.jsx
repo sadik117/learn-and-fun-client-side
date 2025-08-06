@@ -4,12 +4,12 @@ import { Link } from 'react-router';
 
 const HeroSection = () => {
   return (
-    <section className="bg-gradient-to-br from-blue-50 to-purple-50 py-10 px-4 sm:px-6 lg:px-8">
+    <section className="bg-gradient-to-br from-blue-50 to-purple-50 py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Left Column - Text Content */}
           <div className="space-y-5">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-3xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
               <span className="block">Learn Skills.</span>
               <span className="block">Win Rewards.</span>
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
@@ -43,7 +43,7 @@ const HeroSection = () => {
             <img 
               src="https://i.ibb.co.com/WWwp08zq/istockphoto-1182223823-1024x1024.jpg" 
               alt="Hero Pic"
-              className="w-full h-80 max-w-md rounded-xl shadow-lg"
+              className="w-full h-60 md:h-80 max-w-md rounded-xl shadow-lg"
             />
           </div>
         </div>
