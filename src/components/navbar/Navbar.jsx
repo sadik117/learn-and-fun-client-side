@@ -29,7 +29,7 @@ const Navbar = () => {
           {/* Login Button - Desktop */}
           <div className="hidden md:block">
             <Link 
-              to="/login" 
+              to="/auth/login" 
               className="bg-white text-blue-600 px-6 py-2 rounded-full font-semibold hover:shadow-lg transition duration-300"
             >
               Login
