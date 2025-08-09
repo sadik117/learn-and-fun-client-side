@@ -24,7 +24,7 @@ const HeroSection = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 pt-3">
               <Link 
-                to="/signup" 
+                to="/auth/signup" 
                 className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-semibold text-center hover:shadow-lg transition duration-300"
               >
                 Join Now

@@ -13,23 +13,18 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
-  const [tempUser, setTempUser] = useState(null); // store user after password verified, before OTP verified
   const navigate = useNavigate();
   const location = useLocation();
   const axios = useAxios();
 
   const from = location.state?.from?.pathname || "/";
 
-  // Step 1: Handle email/password login and send OTP
+  // Step 1: Directly send OTP
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const result = await signIn(email, password);
-      setTempUser(result.user); // save user temporarily
-
-      // Send OTP to email via backend
-      const res = await axios.post("/send-otp", { email });
-      if (res.data.success) {
+      const otpRes = await axios.post("/send-otp", { email });
+      if (otpRes.data.success) {
         setOtpSent(true);
         toast.success("OTP sent to your email!");
       } else {
@@ -40,19 +35,22 @@ export default function Login() {
     }
   };
 
-  // Step 2: Verify OTP
+  // Step 2: Verify OTP and finalize login
   const handleVerifyOtp = async () => {
     try {
       const res = await axios.post("/verify-otp", { email, otp });
-      if (res.data.success) {
-        // OTP verified, now request JWT and finalize login
-        const { data } = await axios.post("/jwt", { email });
 
+      if (res.data.success) {
+        // OTP valid → now log in officially
+        const result = await signIn(email, password);
+        setUser(result.user);
+
+        // Request JWT from backend
+        const { data } = await axios.post("/jwt", { email });
         if (data.token) {
           localStorage.setItem("access-token", data.token);
         }
 
-        setUser(tempUser);
         toast.success("Login successful!");
         navigate(from, { replace: true });
       } else {
@@ -80,8 +78,8 @@ export default function Login() {
             Welcome Back
           </h2>
 
-          {/* If OTP sent, show OTP input form */}
           {otpSent ? (
+            // OTP verification form
             <div className="space-y-5">
               <label className="block text-white mb-1">Enter OTP</label>
               <input
@@ -101,7 +99,7 @@ export default function Login() {
               </motion.button>
             </div>
           ) : (
-            // Else show normal email/password login form
+            // Email/password form
             <form onSubmit={handleLogin} className="space-y-5">
               <div>
                 <label className="block text-white mb-1">Email</label>

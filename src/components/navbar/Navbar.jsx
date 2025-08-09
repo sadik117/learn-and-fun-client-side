@@ -1,17 +1,19 @@
-import React, { useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { AuthContext } from '../../Authentication/AuthProvider';
+import React, { useState, useContext } from "react";
+import { Link } from "react-router-dom";
+import { AuthContext } from "../../Authentication/AuthProvider";
+import useUserRole from "../../hooks/useUserRole";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logOut } = useContext(AuthContext);
+  const {role} = useUserRole()
 
   const handleLogout = async () => {
     try {
       await logOut();
       setIsMenuOpen(false);
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
   };
 
@@ -36,10 +38,29 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-8">
-            <Link to="/learn" className="hover:opacity-80 transition">Learn</Link>
-            <Link to="/playNwin" className="hover:opacity-80 transition">Play & Win</Link>
-            <Link to="/invite" className="hover:opacity-80 transition">Invite & Earn</Link>
-            <Link to="/about" className="hover:opacity-80 transition">About</Link>
+            <Link to="/" className="hover:opacity-80 transition">
+              Home
+            </Link>
+            <Link to="/learn" className="hover:opacity-80 transition">
+              Learn
+            </Link>
+            <Link to="/playNwin" className="hover:opacity-80 transition">
+              Play & Win
+            </Link>
+            <Link to="/invite" className="hover:opacity-80 transition">
+              Invite & Earn
+            </Link>
+            {user && role === "admin" && (
+              <Link to="/dashboard" className="hover:opacity-80 transition">
+                Dashboard
+              </Link>
+            )}
+
+            {user && role == "user" && (
+              <Link to="/myprofile" className="hover:opacity-80 transition">
+                My Profile
+              </Link>
+            )}
           </div>
 
           {/* Desktop Right Section */}
@@ -48,10 +69,13 @@ const Navbar = () => {
               <>
                 {/* Avatar */}
                 <img
-                  src={user.photoURL || `https://i.ibb.co.com/CsNxKRrN/default-avatar.png`}
+                  src={
+                    user.photoURL ||
+                    `https://i.ibb.co.com/CsNxKRrN/default-avatar.png`
+                  }
                   alt="User Avatar"
                   className="w-8 h-8 rounded-full border-2 border-white"
-                  title={user.displayName || 'User'}
+                  title={user.displayName || "User"}
                 />
                 {/* Logout Button */}
                 <Link
@@ -79,12 +103,32 @@ const Navbar = () => {
             >
               {/* Hamburger / Close Icon */}
               {isMenuOpen ? (
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               ) : (
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
               )}
             </button>
@@ -96,10 +140,38 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-gradient-to-b from-blue-700 to-purple-700 px-4 pb-4">
           <div className="flex flex-col space-y-3 pt-2">
-            <Link to="/learn" className="text-white py-2 border-b border-white/10 hover:bg-white/10 px-2 rounded" onClick={() => setIsMenuOpen(false)}>Learn</Link>
-            <Link to="/playNwin" className="text-white py-2 border-b border-white/10 hover:bg-white/10 px-2 rounded" onClick={() => setIsMenuOpen(false)}>Play & Win</Link>
-            <Link to="/invite" className="text-white py-2 border-b border-white/10 hover:bg-white/10 px-2 rounded" onClick={() => setIsMenuOpen(false)}>Invite & Earn</Link>
-            <Link to="/about" className="text-white py-2 border-b border-white/10 hover:bg-white/10 px-2 rounded" onClick={() => setIsMenuOpen(false)}>About</Link>
+            <Link
+              to="/learn"
+              className="text-white py-2 border-b border-white/10 hover:bg-white/10 px-2 rounded"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Learn
+            </Link>
+            <Link
+              to="/playNwin"
+              className="text-white py-2 border-b border-white/10 hover:bg-white/10 px-2 rounded"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Play & Win
+            </Link>
+            <Link
+              to="/invite"
+              className="text-white py-2 border-b border-white/10 hover:bg-white/10 px-2 rounded"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Invite & Earn
+            </Link>
+            {user && role === "admin" && (
+              <Link to="/dashboard" className="hover:opacity-80 transition">
+                Dashboard
+              </Link>
+            )}
+
+            {user && role == "user" && (
+              <Link to="/myprofile" className="hover:opacity-80 transition">
+                My Profile
+              </Link>
+            )}
 
             {/* Auth Buttons */}
             {user ? (
