@@ -4,23 +4,26 @@ import { useNavigate } from "react-router";
 
 // Create a secure Axios instance
 const axiosSecure = axios.create({
-  baseURL: "http://localhost:3000",
-  withCredentials: true, 
+  baseURL: "http://localhost:3000", 
+  withCredentials: true
 });
 
 const useAxiosSecure = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Request Interceptor
     const requestInterceptor = axiosSecure.interceptors.request.use(
       (config) => {
+        const token = localStorage.getItem("access-token");
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
         return config;
       },
       (error) => Promise.reject(error)
     );
 
-    // Response Interceptor (handle 401 globally)
+    // - Optional: handle 401 globally
     const responseInterceptor = axiosSecure.interceptors.response.use(
       (response) => response,
       (error) => {
@@ -31,7 +34,7 @@ const useAxiosSecure = () => {
       }
     );
 
-    // Cleanup interceptors on unmount
+    // - Cleanup interceptors on unmount
     return () => {
       axiosSecure.interceptors.request.eject(requestInterceptor);
       axiosSecure.interceptors.response.eject(responseInterceptor);

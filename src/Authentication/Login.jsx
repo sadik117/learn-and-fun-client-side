@@ -3,45 +3,68 @@ import { useState, useContext } from "react";
 import { toast } from "react-toastify";
 import Lottie from "lottie-react";
 import loginAnimation from "../assets/login.json";
-import {Link, useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import useAxios from "../hooks/useAxios";
 import { AuthContext } from "./AuthProvider";
-
 
 export default function Login() {
   const { setUser, signIn } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [tempUser, setTempUser] = useState(null); // store user after password verified, before OTP verified
   const navigate = useNavigate();
   const location = useLocation();
   const axios = useAxios();
 
   const from = location.state?.from?.pathname || "/";
 
+  // Step 1: Handle email/password login and send OTP
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const result = await signIn(email, password);
-      const user = result.user;
+      setTempUser(result.user); // save user temporarily
 
-      // Request JWT from your backend for this user
-      const { data } = await axios.post("/jwt", { email: user.email });
-
-      if (data.token) {
-        localStorage.setItem("access-token", data.token);   
+      // Send OTP to email via backend
+      const res = await axios.post("/send-otp", { email });
+      if (res.data.success) {
+        setOtpSent(true);
+        toast.success("OTP sent to your email!");
+      } else {
+        toast.error("Failed to send OTP");
       }
-      //  console.log("Saved JWT token:", data.token);
-
-      setUser(user);
-      toast.success("Login successful!");
-      navigate(from, { replace: true });
     } catch (error) {
       toast.error("Login failed! " + error.message);
     }
   };
 
+  // Step 2: Verify OTP
+  const handleVerifyOtp = async () => {
+    try {
+      const res = await axios.post("/verify-otp", { email, otp });
+      if (res.data.success) {
+        // OTP verified, now request JWT and finalize login
+        const { data } = await axios.post("/jwt", { email });
+
+        if (data.token) {
+          localStorage.setItem("access-token", data.token);
+        }
+
+        setUser(tempUser);
+        toast.success("Login successful!");
+        navigate(from, { replace: true });
+      } else {
+        toast.error(res.data.message || "Invalid OTP");
+      }
+    } catch (error) {
+      toast.error("OTP verification failed! " + error.message);
+    }
+  };
+
   return (
-    <div className="min-h-screen py-20 mx-2 md:mx-10 mt-5 md:mt-10 bg-gradient-to-br from-[#0f2a0f] to-[#1a3827] flex items-center justify-center px-4">
+    <div className="min-h-screen py-20 mx-2 md:mx-10 my-5 md:my-10 bg-gradient-to-br from-[#0a0ac7] to-[#aa24b8] flex items-center justify-center px-4">
       <motion.div
         className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-4xl border border-white/20 flex flex-col md:flex-row gap-6 items-center"
         initial={{ y: 100, opacity: 0 }}
@@ -56,38 +79,62 @@ export default function Login() {
           <h2 className="text-white text-3xl font-bold text-center mb-6">
             Welcome Back
           </h2>
-          <form onSubmit={handleLogin} className="space-y-5">
-            <div>
-              <label className="block text-white mb-1">Email</label>
-              <input
-                type="email"
-                className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-white mb-1">Password</label>
-              <input
-                type="password"
-                className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              type="submit"
-              className="w-full bg-teal-600 hover:bg-teal-700 transition px-4 py-2 rounded-md text-white font-semibold"
-            >
-              Log In
-            </motion.button>
-          </form>
 
-          <p className="text-center text-sm text-white/70 mt-4">
+          {/* If OTP sent, show OTP input form */}
+          {otpSent ? (
+            <div className="space-y-5">
+              <label className="block text-white mb-1">Enter OTP</label>
+              <input
+                type="text"
+                className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter the OTP sent to your email"
+              />
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleVerifyOtp}
+                className="w-full bg-green-600 hover:bg-green-700 transition px-4 py-2 rounded-md text-white font-semibold"
+              >
+                Verify OTP
+              </motion.button>
+            </div>
+          ) : (
+            // Else show normal email/password login form
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div>
+                <label className="block text-white mb-1">Email</label>
+                <input
+                  type="email"
+                  className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-white mb-1">Password</label>
+                <input
+                  type="password"
+                  className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="submit"
+                className="w-full bg-teal-600 hover:bg-teal-700 transition px-4 py-2 rounded-md text-white font-semibold"
+              >
+                Log In
+              </motion.button>
+            </form>
+          )}
+
+          <p className="text-center text-sm text-white mt-4">
             Don’t have an account?{" "}
             <Link to="/auth/signup" className="text-green-400 hover:underline">
               Register
