@@ -185,7 +185,7 @@ export default function Registration() {
                 type="tel"
                 {...register("phone", {
                   required: "Phone number is required",
-                  pattern: { value: /^[0-9]{10,15}$/, message: "Enter a valid phone number" },
+                  pattern: { value: /^[0-9]{11}$/, message: "Enter a valid phone number" },
                 })}
                 className={`w-full px-4 py-2 rounded-md bg-white/10 border ${
                   errors.phone ? "border-red-500" : "border-white/20"

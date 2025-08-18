@@ -28,7 +28,7 @@ const Navbar = () => {
                 <img src="https://i.ibb.co.com/pvd3mGBG/book.png" alt="icon" />
               </span>
               <span className="text-2xl font-bold text-green-400">
-                Learn <span className="text-yellow-400">and</span> Fun
+                Learn <span className="text-yellow-400">and</span> Earn
               </span>
               <span className="rounded-full w-8 h-8 flex items-center justify-center font-bold ml-2">
                 <img src="https://i.ibb.co.com/99zMNb7x/smile.png" alt="icon" />
@@ -51,7 +51,7 @@ const Navbar = () => {
               Invite & Earn
             </Link>
             {user && role === "admin" && (
-              <Link to="/dashboard" className="hover:opacity-80 transition">
+              <Link to="/admin-dashboard" className="hover:opacity-80 transition">
                 Dashboard
               </Link>
             )}
@@ -162,7 +162,7 @@ const Navbar = () => {
               Invite & Earn
             </Link>
             {user && role === "admin" && (
-              <Link to="/dashboard" className="hover:opacity-80 transition">
+              <Link to="/admin-dashboard" className="hover:opacity-80 transition">
                 Dashboard
               </Link>
             )}

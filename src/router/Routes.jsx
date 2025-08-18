@@ -9,6 +9,11 @@ import MyProfile from "../components/pages/MyProfile";
 import Learn from "../components/pages/Learn";
 import PlayAndWin from "../components/pages/PlayAndWin";
 import InviteAndEarn from "../components/pages/InviteAndEarn";
+import AdminDashboard from "../Admin/AdminDashboard";
+import AdminRoute from "../Admin/AdminRoute";
+import Members from "../Admin/Members";
+import Pendings from "../Admin/Pendings";
+import Payments from "../Admin/Payments";
 
 export const router = createBrowserRouter([
   {
@@ -35,27 +40,69 @@ export const router = createBrowserRouter([
       },
       {
         path: "/myprofile",
-        element: <PrivateRoute>
-          <MyProfile></MyProfile>
-        </PrivateRoute>
+        element: (
+          <PrivateRoute>
+            <MyProfile></MyProfile>
+          </PrivateRoute>
+        ),
       },
       {
         path: "/learn",
-        element: <PrivateRoute>
-          <Learn></Learn>
-        </PrivateRoute>
+        element: (
+          <PrivateRoute>
+            <Learn></Learn>
+          </PrivateRoute>
+        ),
       },
       {
         path: "/playNwin",
-        element: <PrivateRoute>
-          <PlayAndWin></PlayAndWin>
-        </PrivateRoute>
+        element: (
+          <PrivateRoute>
+            <PlayAndWin></PlayAndWin>
+          </PrivateRoute>
+        ),
       },
       {
         path: "/invite",
-        element: <PrivateRoute>
-          <InviteAndEarn></InviteAndEarn>
-        </PrivateRoute>
+        element: (
+          <PrivateRoute>
+            <InviteAndEarn></InviteAndEarn>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/admin-dashboard",
+        element: (
+          <PrivateRoute>
+            <AdminDashboard></AdminDashboard>
+          </PrivateRoute>
+        ),
+        children: [
+          {
+            path: "members",
+            element: (
+              <AdminRoute>
+                <Members></Members>
+              </AdminRoute>
+            ),
+          },
+          {
+            path: "pending",
+            element: (
+              <AdminRoute>
+                <Pendings></Pendings>
+              </AdminRoute>
+            ),
+          },
+          {
+            path: "payments",
+            element: (
+              <AdminRoute>
+                <Payments></Payments>
+              </AdminRoute>
+            ),
+          },
+        ],
       },
     ],
   },

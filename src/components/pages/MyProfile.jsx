@@ -58,6 +58,7 @@ export default function MyProfile() {
             className="w-28 h-28 rounded-full border-4 border-white shadow-lg"
           />
         )}
+      
         <h2 className="text-2xl font-bold mt-4 inline-flex gap-1"><span><LuCrown className="mt-0.5"></LuCrown></span>{profile.name}</h2>
         <p className="text-gray-200">{profile.email}</p>
         <p className="mt-2">
@@ -88,7 +89,7 @@ export default function MyProfile() {
 
         {referrer && (
           <p className="mt-2 text-sm text-gray-300">
-            Invited by <span className="font-semibold">{referrer.name}</span>
+            Referred by <span className="font-semibold">{referrer.name}</span>
           </p>
         )}
       </div>

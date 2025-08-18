@@ -7,7 +7,7 @@ const Footer = () => {
       <aside>
        <img src="https://i.ibb.co.com/Q7PVt9Sd/gettyimages-1470968033-2048x2048.jpg" alt="footer image" className="h-30 w-30 rounded-lg" />
         <p className="font-bold">
-          Learn and Fun
+          Learn and Earn
           <br />
           Providing reliable process..
         </p>
