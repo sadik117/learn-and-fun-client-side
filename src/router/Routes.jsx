@@ -12,8 +12,9 @@ import InviteAndEarn from "../components/pages/InviteAndEarn";
 import AdminDashboard from "../Admin/AdminDashboard";
 import AdminRoute from "../Admin/AdminRoute";
 import Members from "../Admin/Members";
-import Pendings from "../Admin/Pendings";
+import Pendings from "../Admin/PendingUsers";
 import Payments from "../Admin/Payments";
+import MemberProfile from "../Admin/MemberProfile";
 
 export const router = createBrowserRouter([
   {
@@ -103,6 +104,14 @@ export const router = createBrowserRouter([
             ),
           },
         ],
+      },
+      {
+        path: "/members/profile/:email",
+        element: (
+          <AdminRoute>
+            <MemberProfile></MemberProfile>
+          </AdminRoute>
+        ),
       },
     ],
   },

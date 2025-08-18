@@ -11,8 +11,9 @@ import {
   FiX
 } from "react-icons/fi";
 import Members from "./Members";
-import Pendings from "./Pendings";
+import Pendings from "./PendingUsers";
 import Payments from "./Payments";
+import MemberProfile from "./MemberProfile";
 
 const AdminDashboard = () => {
   const location = useLocation();
@@ -107,6 +108,7 @@ const AdminDashboard = () => {
             <Route path="/members" element={<Members></Members>} />
             <Route path="/pending" element={<Pendings></Pendings>} />
             <Route path="/payments" element={<Payments></Payments>} />
+            <Route path="/members/:email" element={<MemberProfile />} />
           </Routes>
         </main>
       </div>

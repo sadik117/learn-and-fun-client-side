@@ -48,9 +48,9 @@ export default function MyProfile() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6 text-white">
+    <div className="min-h-screen bg-gray-900 text-white py-4 px-4 sm:px-6 lg:px-8"> 
       {/* Profile Card */}
-      <div className="bg-gradient-to-r from-gray-700 to-gray-900 p-6 rounded-2xl shadow-lg flex flex-col items-center">
+      <div className="bg-gray-700 p-6 my-5 rounded-2xl shadow-lg flex flex-col items-center">
         {profile.photoURL && (
           <img
             src={profile.photoURL}
@@ -97,7 +97,7 @@ export default function MyProfile() {
       {/* Stats Section */}
       <div className="grid grid-cols-2 gap-6">
         {/* Profits */}
-        <div className="bg-gray-900 p-6 rounded-2xl shadow-lg text-center">
+        <div className="bg-gray-700 p-6 rounded-2xl shadow-lg text-center">
           <h3 className="text-xl font-semibold mb-2">Profits</h3>
           <p className="text-2xl font-bold text-green-400">
             {profile.profitBUSD || 0} TAKA
@@ -105,14 +105,14 @@ export default function MyProfile() {
         </div>
 
         {/* Team */}
-        <div className="bg-gray-900 p-6 rounded-2xl shadow-lg text-center">
+        <div className="bg-gray-700 p-6 rounded-2xl shadow-lg text-center">
           <h3 className="text-xl font-semibold mb-2">Team</h3>
           <p className="text-3xl font-bold text-blue-400">{team.length}</p>
         </div>
       </div>
 
       {/* Team Members List */}
-      <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+      <div className="bg-gray-800 p-6 rounded-2xl shadow-lg mt-5">
         <h3 className="text-xl font-semibold mb-4">Team Members</h3>
         {team.length === 0 ? (
           <p className="text-gray-400">No team members yet.</p>
