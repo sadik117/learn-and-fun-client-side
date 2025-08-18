@@ -11,53 +11,30 @@ export default function Login() {
   const { setUser, signIn } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const axios = useAxios();
 
   const from = location.state?.from?.pathname || "/";
 
-  // Step 1: Directly send OTP
+  // Handle email/password login
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const otpRes = await axios.post("/send-otp", { email });
-      if (otpRes.data.success) {
-        setOtpSent(true);
-        toast.success("OTP sent to your email!");
-      } else {
-        toast.error("Failed to send OTP");
+      // Firebase / custom signIn function
+      const result = await signIn(email, password);
+      setUser(result.user);
+
+      // Request JWT from backend
+      const { data } = await axios.post("/jwt", { email });
+      if (data.token) {
+        localStorage.setItem("access-token", data.token);
       }
+
+      toast.success("Login successful!");
+      navigate(from, { replace: true });
     } catch (error) {
       toast.error("Login failed! " + error.message);
-    }
-  };
-
-  // Step 2: Verify OTP and finalize login
-  const handleVerifyOtp = async () => {
-    try {
-      const res = await axios.post("/verify-otp", { email, otp });
-
-      if (res.data.success) {
-        // OTP valid → now log in officially
-        const result = await signIn(email, password);
-        setUser(result.user);
-
-        // Request JWT from backend
-        const { data } = await axios.post("/jwt", { email });
-        if (data.token) {
-          localStorage.setItem("access-token", data.token);
-        }
-
-        toast.success("Login successful!");
-        navigate(from, { replace: true });
-      } else {
-        toast.error(res.data.message || "Invalid OTP");
-      }
-    } catch (error) {
-      toast.error("OTP verification failed! " + error.message);
     }
   };
 
@@ -78,59 +55,37 @@ export default function Login() {
             Welcome Back
           </h2>
 
-          {otpSent ? (
-            // OTP verification form
-            <div className="space-y-5">
-              <label className="block text-white mb-1">Enter OTP</label>
+          {/* Email/password form */}
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <label className="block text-white mb-1">Email</label>
               <input
-                type="text"
+                type="email"
                 className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="Enter the OTP sent to your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleVerifyOtp}
-                className="w-full bg-green-600 hover:bg-green-700 transition px-4 py-2 rounded-md text-white font-semibold"
-              >
-                Verify OTP
-              </motion.button>
             </div>
-          ) : (
-            // Email/password form
-            <form onSubmit={handleLogin} className="space-y-5">
-              <div>
-                <label className="block text-white mb-1">Email</label>
-                <input
-                  type="email"
-                  className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-white mb-1">Password</label>
-                <input
-                  type="password"
-                  className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                type="submit"
-                className="w-full bg-teal-600 hover:bg-teal-700 transition px-4 py-2 rounded-md text-white font-semibold"
-              >
-                Log In
-              </motion.button>
-            </form>
-          )}
+            <div>
+              <label className="block text-white mb-1">Password</label>
+              <input
+                type="password"
+                className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              type="submit"
+              className="w-full bg-teal-600 hover:bg-teal-700 transition px-4 py-2 rounded-md text-white font-semibold"
+            >
+              Log In
+            </motion.button>
+          </form>
 
           <p className="text-center text-sm text-white mt-4">
             Don’t have an account?{" "}

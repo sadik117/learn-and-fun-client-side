@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
@@ -19,6 +19,12 @@ export default function Registration() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const referredBy = useMemo(() => {
+    const q = new URLSearchParams(location.search);
+    const ref = q.get("ref");
+    return ref ? ref.toUpperCase() : null;
+  }, [location.search]);
+
   const {
     register,
     handleSubmit,
@@ -37,78 +43,58 @@ export default function Registration() {
   const handleImageUpload = async (e) => {
     const image = e.target.files[0];
     if (!image) return;
-
     const formDataImg = new FormData();
     formDataImg.append("image", image);
     setUploading(true);
     try {
       const res = await fetch(
         `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
-        {
-          method: "POST",
-          body: formDataImg,
-        }
+        { method: "POST", body: formDataImg }
       );
       const data = await res.json();
       if (data.success) {
         setPhotoURL(data.data.url);
         toast.success("Photo uploaded!");
-      } else {
-        toast.error("Upload failed");
-      }
-    } catch (err) {
+      } else toast.error("Upload failed");
+    } catch {
       toast.error("Upload error");
     } finally {
       setUploading(false);
     }
   };
 
-  // Send OTP to email
+  // Send OTP
   const onSendOtp = async () => {
     const email = getValues("email");
-    if (!email) {
-      toast.error("Please enter your email first");
-      return;
-    }
+    if (!email) return toast.error("Please enter your email first");
     try {
       const res = await axiosSecure.post("/send-otp", { email });
       if (res.data.success) {
         setOtpSent(true);
         toast.success("OTP sent to your email!");
-      } else {
-        toast.error("Failed to send OTP");
-      }
+      } else toast.error("Failed to send OTP");
     } catch (error) {
       toast.error("Error sending OTP: " + error.message);
     }
   };
 
-  // Verify OTP by calling backend
+  // Verify OTP
   const onVerifyOtp = async () => {
     const email = getValues("email");
-    if (!otp) {
-      toast.error("Please enter the OTP");
-      return;
-    }
+    if (!otp) return toast.error("Please enter the OTP");
     try {
       const res = await axiosSecure.post("/verify-otp", { email, otp });
       if (res.data.success) {
         setOtpVerified(true);
         toast.success("OTP verified! You can now register.");
-      } else {
-        toast.error(res.data.message || "Invalid OTP");
-      }
+      } else toast.error(res.data.message || "Invalid OTP");
     } catch (error) {
       toast.error("Error verifying OTP: " + error.message);
     }
   };
 
   const onSubmit = async (data) => {
-    if (!otpVerified) {
-      toast.error("Please verify your email OTP before registering.");
-      return;
-    }
-
+    if (!otpVerified) return toast.error("Verify OTP before registering.");
     if (!validatePassword(data.password)) {
       setError("password", {
         type: "manual",
@@ -117,23 +103,16 @@ export default function Registration() {
       });
       return;
     }
-
-    if (!photoURL) {
-      toast.error("Please upload a profile picture before registering.");
-      return;
-    }
+    if (!photoURL) return toast.error("Please upload a profile picture.");
 
     try {
-      // Register user with Firebase
+      // Firebase account
       const result = await createUser(data.email, data.password);
 
-      // Update Firebase user profile
-      await updateUserProfile({
-        displayName: data.name,
-        photoURL,
-      });
+      // Firebase profile
+      await updateUserProfile({ displayName: data.name, photoURL });
 
-      // Prepare user info for backend
+      // ✅ include referredBy from URL in the payload
       const userInfo = {
         email: data.email,
         name: data.name,
@@ -142,26 +121,17 @@ export default function Registration() {
         role: "user",
         created_at: new Date().toISOString(),
         last_log_in: new Date().toISOString(),
+        referredBy, // <-- IMPORTANT
       };
 
-      // Send user info to backend & get JWT token
+      // Store in backend & get JWT
       const response = await axiosSecure.post("/users", userInfo);
-
-      // Save JWT token to localStorage
       const token = response.data.token;
-      if (token) {
-        localStorage.setItem("access-token", token);
-      } else {
-        toast.error("Failed to receive token");
-        return;
-      }
+      if (!token) return toast.error("Failed to receive token");
+      localStorage.setItem("access-token", token);
 
-      // Set user in context
-      setUser({
-        ...result.user,
-        displayName: data.name,
-        photoURL,
-      });
+      // Put into context
+      setUser({ ...result.user, displayName: data.name, photoURL });
 
       toast.success("Registration successful!");
       navigate(location.state?.from || "/");
@@ -180,11 +150,20 @@ export default function Registration() {
         transition={{ type: "spring", stiffness: 80 }}
       >
         <div className="w-full md:w-1/2">
-          <Lottie animationData={registerAnimation} loop={true} />
+          <Lottie animationData={registerAnimation} loop />
         </div>
 
         <div className="w-full md:w-1/2">
           <h2 className="text-white text-3xl font-bold text-center mb-6">Register</h2>
+
+          {/* Small chip to show referral source if present */}
+          {referredBy && (
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-white text-sm">
+              Referred by
+              <span className="font-semibold tracking-wider">{referredBy}</span>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
             {/* Name */}
             <div>
@@ -196,30 +175,23 @@ export default function Registration() {
                   errors.name ? "border-red-500" : "border-white/20"
                 } text-white`}
               />
-              {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-              )}
+              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
             </div>
 
-            {/* Phone Number */}
+            {/* Phone */}
             <div>
               <label className="block text-white mb-1">Phone Number</label>
               <input
                 type="tel"
                 {...register("phone", {
                   required: "Phone number is required",
-                  pattern: {
-                    value: /^[0-9]{10,15}$/,
-                    message: "Enter a valid phone number",
-                  },
+                  pattern: { value: /^[0-9]{10,15}$/, message: "Enter a valid phone number" },
                 })}
                 className={`w-full px-4 py-2 rounded-md bg-white/10 border ${
                   errors.phone ? "border-red-500" : "border-white/20"
                 } text-white`}
               />
-              {errors.phone && (
-                <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
-              )}
+              {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
             </div>
 
             {/* Image Upload */}
@@ -231,15 +203,9 @@ export default function Registration() {
                 onChange={handleImageUpload}
                 className="w-full px-3 py-2 rounded bg-white/10 border border-white/20 text-white file:text-white file:bg-teal-600 file:border-none file:px-4 file:py-1.5 file:rounded hover:file:bg-teal-700"
               />
-              {uploading && (
-                <p className="text-yellow-300 text-sm mt-1">Uploading...</p>
-              )}
+              {uploading && <p className="text-yellow-300 text-sm mt-1">Uploading...</p>}
               {photoURL && (
-                <img
-                  src={photoURL}
-                  alt="Preview"
-                  className="mt-2 w-14 h-14 rounded-full ring ring-primary object-cover"
-                />
+                <img src={photoURL} alt="Preview" className="mt-2 w-14 h-14 rounded-full ring ring-primary object-cover" />
               )}
             </div>
 
@@ -250,21 +216,16 @@ export default function Registration() {
                 type="email"
                 {...register("email", {
                   required: "Email is required",
-                  pattern: {
-                    value: /^\S+@\S+$/i,
-                    message: "Invalid email address",
-                  },
+                  pattern: { value: /^\S+@\S+$/i, message: "Invalid email address" },
                 })}
                 className={`w-full px-4 py-2 rounded-md bg-white/10 border ${
                   errors.email ? "border-red-500" : "border-white/20"
                 } text-white`}
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
             </div>
 
-            {/* OTP Section */}
+            {/* OTP */}
             {!otpSent ? (
               <button
                 type="button"
@@ -307,9 +268,7 @@ export default function Registration() {
                   errors.password ? "border-red-500" : "border-white/20"
                 } text-white`}
               />
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-              )}
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
             </div>
 
             {/* Submit */}
@@ -325,7 +284,6 @@ export default function Registration() {
             </motion.button>
           </form>
 
-          {/* Link to login */}
           <p className="text-center text-sm text-white mt-4">
             Already have an account?{" "}
             <Link to="/auth/login" className="text-green-400 hover:underline">

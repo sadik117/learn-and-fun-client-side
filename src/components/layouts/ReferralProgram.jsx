@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaUserFriends, FaGraduationCap, FaMoneyBillWave, FaShareAlt } from 'react-icons/fa';
+import { Link } from 'react-router';
 
 const ReferralProgram = () => {
   const steps = [
@@ -62,9 +63,9 @@ const ReferralProgram = () => {
               )}
               
               {index === 3 && (
-                <button className="mt-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg transition duration-300 w-full">
+                <Link to="myprofile" className="mt-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg transition duration-300 w-full">
                   Get Referral Link
-                </button>
+                </Link>
               )}
             </div>
           ))}
