@@ -1,13 +1,11 @@
-import React from 'react';
+import React from "react";
 
 const Loading = () => {
-    return (
-        <div className='min-h-screen flex justify-center items-center gap-2'>
-            <span className="loading loading-spinner text-warning text-2xl"></span>
-            <span className="loading loading-spinner text-warning text-2xl"></span>
-            <span className="loading loading-spinner text-warning text-2xl"></span>
-        </div>
-    );
+  return (
+    <div className="flex justify-center py-12">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
 };
 
 export default Loading;

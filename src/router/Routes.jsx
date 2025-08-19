@@ -15,6 +15,7 @@ import Members from "../Admin/Members";
 import Pendings from "../Admin/PendingUsers";
 import Payments from "../Admin/Payments";
 import MemberProfile from "../Admin/MemberProfile";
+import PaymentPage from "../components/pages/PaymentPage";
 
 export const router = createBrowserRouter([
   {
@@ -67,7 +68,7 @@ export const router = createBrowserRouter([
         path: "/invite",
         element: (
           <PrivateRoute>
-            <InviteAndEarn></InviteAndEarn>
+            <PaymentPage></PaymentPage>
           </PrivateRoute>
         ),
       },

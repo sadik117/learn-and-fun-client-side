@@ -42,8 +42,8 @@ export default function Members() {
     return (
       <div className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-xl font-bold mb-4">Members</h2>
-        <div className="flex justify-center py-12">
-          <ImSpinner8 className="animate-spin text-3xl text-blue-500" />
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       </div>
     );
