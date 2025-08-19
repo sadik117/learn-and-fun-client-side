@@ -34,10 +34,8 @@ export default function Registration() {
   } = useForm();
 
   const validatePassword = (password) => {
-    const hasUpper = /[A-Z]/.test(password);
-    const hasLower = /[a-z]/.test(password);
     const isLongEnough = password.length >= 6;
-    return hasUpper && hasLower && isLongEnough;
+    return isLongEnough;
   };
 
   const handleImageUpload = async (e) => {
@@ -48,7 +46,9 @@ export default function Registration() {
     setUploading(true);
     try {
       const res = await fetch(
-        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
+        `https://api.imgbb.com/1/upload?key=${
+          import.meta.env.VITE_IMGBB_API_KEY
+        }`,
         { method: "POST", body: formDataImg }
       );
       const data = await res.json();
@@ -106,28 +106,30 @@ export default function Registration() {
     if (!photoURL) return toast.error("Please upload a profile picture.");
 
     try {
-      // Firebase account
-      const result = await createUser(data.email, data.password);
-
-      // Firebase profile
-      await updateUserProfile({ displayName: data.name, photoURL });
-
-      // ✅ include referredBy from URL in the payload
+      // Step 1: Store in backend
       const userInfo = {
         email: data.email,
         name: data.name,
         photoURL,
         phone: data.phone,
         role: "user",
-        created_at: new Date().toISOString(),
-        last_log_in: new Date().toISOString(),
-        referredBy, // <-- IMPORTANT
+        referredBy,
       };
 
-      // Store in backend & get JWT
       const response = await axiosSecure.post("/users", userInfo);
       const token = response.data.token;
-      if (!token) return toast.error("Failed to receive token");
+      if (!token) {
+        toast.error("Failed to register in backend.");
+        return;
+      }
+
+      // Step 2: Firebase account
+      const result = await createUser(data.email, data.password);
+
+      // Step 3: Firebase profile update
+      await updateUserProfile({ displayName: data.name, photoURL });
+
+      // Save JWT
       localStorage.setItem("access-token", token);
 
       // Put into context
@@ -138,6 +140,13 @@ export default function Registration() {
     } catch (error) {
       console.error(error);
       toast.error("Registration failed: " + error.message);
+
+      // Rollback: remove DB user if Firebase failed
+      try {
+        await axiosSecure.delete(`/users/${getValues("email")}`);
+      } catch (rollbackErr) {
+        console.error("Rollback failed:", rollbackErr);
+      }
     }
   };
 
@@ -154,7 +163,9 @@ export default function Registration() {
         </div>
 
         <div className="w-full md:w-1/2">
-          <h2 className="text-white text-3xl font-bold text-center mb-6">Register</h2>
+          <h2 className="text-white text-3xl font-bold text-center mb-6">
+            Register
+          </h2>
 
           {/* Small chip to show referral source if present */}
           {referredBy && (
@@ -164,7 +175,11 @@ export default function Registration() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-4"
+            noValidate
+          >
             {/* Name */}
             <div>
               <label className="block text-white mb-1">Name</label>
@@ -175,7 +190,11 @@ export default function Registration() {
                   errors.name ? "border-red-500" : "border-white/20"
                 } text-white`}
               />
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.name.message}
+                </p>
+              )}
             </div>
 
             {/* Phone */}
@@ -185,13 +204,20 @@ export default function Registration() {
                 type="tel"
                 {...register("phone", {
                   required: "Phone number is required",
-                  pattern: { value: /^[0-9]{11}$/, message: "Enter a valid phone number" },
+                  pattern: {
+                    value: /^[0-9]{11}$/,
+                    message: "Enter a valid phone number",
+                  },
                 })}
                 className={`w-full px-4 py-2 rounded-md bg-white/10 border ${
                   errors.phone ? "border-red-500" : "border-white/20"
                 } text-white`}
               />
-              {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.phone.message}
+                </p>
+              )}
             </div>
 
             {/* Image Upload */}
@@ -203,9 +229,15 @@ export default function Registration() {
                 onChange={handleImageUpload}
                 className="w-full px-3 py-2 rounded bg-white/10 border border-white/20 text-white file:text-white file:bg-teal-600 file:border-none file:px-4 file:py-1.5 file:rounded hover:file:bg-teal-700"
               />
-              {uploading && <p className="text-yellow-300 text-sm mt-1">Uploading...</p>}
+              {uploading && (
+                <p className="text-yellow-300 text-sm mt-1">Uploading...</p>
+              )}
               {photoURL && (
-                <img src={photoURL} alt="Preview" className="mt-2 w-14 h-14 rounded-full ring ring-primary object-cover" />
+                <img
+                  src={photoURL}
+                  alt="Preview"
+                  className="mt-2 w-14 h-14 rounded-full ring ring-primary object-cover"
+                />
               )}
             </div>
 
@@ -216,13 +248,20 @@ export default function Registration() {
                 type="email"
                 {...register("email", {
                   required: "Email is required",
-                  pattern: { value: /^\S+@\S+$/i, message: "Invalid email address" },
+                  pattern: {
+                    value: /^\S+@\S+$/i,
+                    message: "Invalid email address",
+                  },
                 })}
                 className={`w-full px-4 py-2 rounded-md bg-white/10 border ${
                   errors.email ? "border-red-500" : "border-white/20"
                 } text-white`}
               />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             {/* OTP */}
@@ -253,7 +292,9 @@ export default function Registration() {
                     Verify OTP
                   </button>
                 ) : (
-                  <p className="text-green-400 mt-2 font-semibold">OTP Verified ✔️</p>
+                  <p className="text-green-400 mt-2 font-semibold">
+                    OTP Verified ✔️
+                  </p>
                 )}
               </div>
             )}
@@ -268,7 +309,11 @@ export default function Registration() {
                   errors.password ? "border-red-500" : "border-white/20"
                 } text-white`}
               />
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             {/* Submit */}

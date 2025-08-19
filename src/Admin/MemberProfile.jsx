@@ -44,7 +44,7 @@ export default function MemberProfile() {
             <h2 className="text-3xl font-bold mb-2">{member.name}</h2>
             <p className="text-gray-300 mb-1"><strong>Email:</strong> {member.email}</p>
             {member.phone && <p className="text-gray-300 mb-1"><strong>Phone:</strong> {member.phone}</p>}
-            <p className="text-gray-300 mb-1"><strong>Referral Code:</strong> {member.referralCode}</p>
+            <p className="text-gray-300 mb-1"><strong>Member ID:</strong> {member.referralCode}</p>
             {member.referrer && (
               <p className="text-gray-300 mb-1">
                 <strong>Referred By:</strong> {member.referrer.name} ({member.referrer.email})
