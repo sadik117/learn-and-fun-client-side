@@ -6,7 +6,7 @@ import useUserRole from "../../hooks/useUserRole";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logOut } = useContext(AuthContext);
-  const {role} = useUserRole()
+  const { role } = useUserRole();
 
   const handleLogout = async () => {
     try {
@@ -47,16 +47,21 @@ const Navbar = () => {
             <Link to="/playNwin" className="hover:opacity-80 transition">
               Play & Win
             </Link>
-            <Link to="/invite" className="hover:opacity-80 transition">
-              Invite & Earn
-            </Link>
+            {user && role === "user" && (
+              <Link to="/makepayment" className="hover:opacity-80 transition">
+                Make Payment
+              </Link>
+            )}
             {user && role === "admin" && (
-              <Link to="/admin-dashboard" className="hover:opacity-80 transition">
+              <Link
+                to="/admin-dashboard"
+                className="hover:opacity-80 transition"
+              >
                 Dashboard
               </Link>
             )}
 
-            {user && role == "user" && (
+            {user && role == "member" && (
               <Link to="/myprofile" className="hover:opacity-80 transition">
                 My Profile
               </Link>
@@ -154,20 +159,26 @@ const Navbar = () => {
             >
               Play & Win
             </Link>
-            <Link
-              to="/invite"
-              className="text-white py-2 border-b border-white/10 hover:bg-white/10 px-2 rounded"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Invite & Earn
-            </Link>
+
+            {user && role === "user" && (
+              <Link
+                to="/makepayment"
+                className="text-white py-2 border-b border-white/10 hover:bg-white/10 px-2 rounded"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Make Payment
+              </Link>
+            )}
             {user && role === "admin" && (
-              <Link to="/admin-dashboard" className="hover:opacity-80 transition">
+              <Link
+                to="/admin-dashboard"
+                className="hover:opacity-80 transition"
+              >
                 Dashboard
               </Link>
             )}
 
-            {user && role == "user" && (
+            {user && role == "member" && (
               <Link to="/myprofile" className="hover:opacity-80 transition">
                 My Profile
               </Link>

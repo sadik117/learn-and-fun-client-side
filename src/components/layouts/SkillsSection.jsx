@@ -6,11 +6,10 @@ const SkillsSection = () => {
     { name: 'Graphics Design', icon: '🎨' },
     { name: 'UI/UX', icon: '🖌️' },
     { name: 'Web Design', icon: '💻' },
-    { name: 'Motivation', icon: '💪' }
   ];
 
   return (
-    <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white">
+    <section className="py-8 px-6 sm:px-8 lg:px-10 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -24,7 +23,7 @@ const SkillsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {courses.map((course, index) => (
             <div 
               key={index}

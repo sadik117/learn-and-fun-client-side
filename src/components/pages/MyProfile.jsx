@@ -58,11 +58,12 @@ export default function MyProfile() {
             className="w-28 h-28 rounded-full border-4 border-white shadow-lg"
           />
         )}
-      
+        
+        <h1 className="text-lg font-bold">Balance: <span className="text-emerald-500">{profile.balance}৳ </span></h1>
         <h2 className="text-2xl font-bold mt-4 inline-flex gap-1"><span><LuCrown className="mt-0.5"></LuCrown></span>{profile.name}</h2>
         <p className="text-gray-200">{profile.email}</p>
         <p className="mt-2">
-          <strong>ID:</strong> {profile.referralCode || "N/A"}
+          <strong>ID:</strong> {profile.referralCode || "N/A"} 
         </p>
 
         {referralLink && (
@@ -100,7 +101,7 @@ export default function MyProfile() {
         <div className="bg-gray-700 p-6 rounded-2xl shadow-lg text-center">
           <h3 className="text-xl font-semibold mb-2">Profits</h3>
           <p className="text-2xl font-bold text-green-400">
-            {profile.profitBUSD || 0} TAKA
+            {profile.balance || 0} ৳
           </p>
         </div>
 
