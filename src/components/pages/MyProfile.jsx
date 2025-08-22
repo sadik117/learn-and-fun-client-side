@@ -1,9 +1,10 @@
 import { useEffect, useState, useContext } from "react";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
 import Loading from "../layouts/Loading";
 import { AuthContext } from "../../Authentication/AuthProvider";
 import { FiCopy } from "react-icons/fi";
 import { LuCrown } from "react-icons/lu";
+import { GiCash } from "react-icons/gi";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 export default function MyProfile() {
   const axiosSecure = useAxiosSecure();
@@ -48,7 +49,7 @@ export default function MyProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white py-4 px-4 sm:px-6 lg:px-8"> 
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 text-white py-4 px-4 sm:px-6 lg:px-8">
       {/* Profile Card */}
       <div className="bg-gray-700 p-6 my-5 rounded-2xl shadow-lg flex flex-col items-center">
         {profile.photoURL && (
@@ -58,12 +59,26 @@ export default function MyProfile() {
             className="w-28 h-28 rounded-full border-4 border-white shadow-lg"
           />
         )}
-        
-        <h1 className="text-lg font-bold">Balance: <span className="text-emerald-500">{profile.balance}৳ </span></h1>
-        <h2 className="text-2xl font-bold mt-4 inline-flex gap-1"><span><LuCrown className="mt-0.5"></LuCrown></span>{profile.name}</h2>
+
+        <h1 className="text-lg font-bold flex items-center gap-2">
+         <GiCash className="-mr-1"></GiCash> Balance: <span className="text-emerald-500 mt-0.5">{profile.balance}৳</span>
+          <button
+            onClick={() => (window.location.href = "/withdraw")}
+            className="px-2 py-0.5 ml-2 bg-yellow-500 hover:bg-yellow-600 rounded-md text-sm font-semibold"
+          >
+            Withdraw
+          </button>
+        </h1>
+
+        <h2 className="text-2xl font-bold mt-4 inline-flex gap-1">
+          <span>
+            <LuCrown className="mt-0.5"></LuCrown>
+          </span>
+          {profile.name}
+        </h2>
         <p className="text-gray-200">{profile.email}</p>
         <p className="mt-2">
-          <strong>ID:</strong> {profile.referralCode || "N/A"} 
+          <strong>ID:</strong> {profile.referralCode || "N/A"}
         </p>
 
         {referralLink && (

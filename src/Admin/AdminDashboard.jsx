@@ -14,6 +14,8 @@ import Members from "./Members";
 import Pendings from "./PendingUsers";
 import Payments from "./Payments";
 import MemberProfile from "./MemberProfile";
+import { FaMoneyBill } from "react-icons/fa";
+import WithdrawRequests from "./WithdrawalRequests";
 
 const AdminDashboard = () => {
   const location = useLocation();
@@ -24,6 +26,7 @@ const AdminDashboard = () => {
     { to: "/admin-dashboard/members", label: "All Members", icon: <FiUsers /> },
     { to: "/admin-dashboard/pending", label: "Pending Users", icon: <FiUserPlus /> },
     { to: "/admin-dashboard/payments", label: "Payments", icon: <FiDollarSign /> },
+    { to: "/admin-dashboard/withdrawals", label: "Withdrawals", icon: <FaMoneyBill></FaMoneyBill> },
   ];
 
   return (
@@ -108,6 +111,7 @@ const AdminDashboard = () => {
             <Route path="/members" element={<Members></Members>} />
             <Route path="/pending" element={<Pendings></Pendings>} />
             <Route path="/payments" element={<Payments></Payments>} />
+            <Route path="/withdrawals" element={<WithdrawRequests></WithdrawRequests>}></Route>
             <Route path="/members/:email" element={<MemberProfile />} />
           </Routes>
         </main>

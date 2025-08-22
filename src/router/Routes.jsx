@@ -16,6 +16,8 @@ import Pendings from "../Admin/PendingUsers";
 import Payments from "../Admin/Payments";
 import MemberProfile from "../Admin/MemberProfile";
 import PaymentPage from "../components/pages/PaymentPage";
+import WithdrawPage from "../components/pages/WithdrawPage";
+import WithdrawRequests from "../Admin/WithdrawalRequests";
 
 export const router = createBrowserRouter([
   {
@@ -73,6 +75,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "/withdraw",
+        element: (
+          <PrivateRoute>
+            <WithdrawPage></WithdrawPage>
+          </PrivateRoute>
+        ),
+      },
+      {
         path: "/admin-dashboard",
         element: (
           <PrivateRoute>
@@ -101,6 +111,14 @@ export const router = createBrowserRouter([
             element: (
               <AdminRoute>
                 <Payments></Payments>
+              </AdminRoute>
+            ),
+          },
+          {
+            path: "withdrawals",
+            element: (
+              <AdminRoute>
+                <WithdrawRequests></WithdrawRequests>
               </AdminRoute>
             ),
           },
