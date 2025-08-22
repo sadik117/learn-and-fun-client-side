@@ -25,7 +25,7 @@ export default function WithdrawPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 text-white flex items-center justify-center px-4">
       <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md shadow-lg">
         <h1 className="text-2xl font-bold mb-6 text-center">Withdraw Balance</h1>
 
@@ -56,8 +56,8 @@ export default function WithdrawPage() {
           <p
             className={`mt-4 text-center ${
               message.toLowerCase().includes("success")
-                ? "text-green-400"
-                : "text-red-400"
+                ? "text-red-400"
+                : "text-green-400"
             }`}
           >
             {message}

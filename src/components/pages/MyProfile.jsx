@@ -116,7 +116,7 @@ export default function MyProfile() {
         <div className="bg-gray-700 p-6 rounded-2xl shadow-lg text-center">
           <h3 className="text-xl font-semibold mb-2">Profits</h3>
           <p className="text-2xl font-bold text-green-400">
-            {profile.balance || 0} ৳
+            {profile.profits || 0} ৳
           </p>
         </div>
 
