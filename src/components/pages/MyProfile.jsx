@@ -64,7 +64,7 @@ export default function MyProfile() {
          <GiCash className="-mr-1"></GiCash> Balance: <span className="text-emerald-500 mt-0.5">{profile.balance}৳</span>
           <button
             onClick={() => (window.location.href = "/withdraw")}
-            className="px-2 py-0.5 ml-2 bg-yellow-500 hover:bg-yellow-600 rounded-md text-sm font-semibold"
+            className="px-2 py-0.5 ml-2 bg-purple-500 hover:bg-purple-600 rounded-md text-sm font-medium"
           >
             Withdraw
           </button>
@@ -86,7 +86,7 @@ export default function MyProfile() {
             <strong>Referral Link:</strong>
             <a
               href={referralLink}
-              className="text-yellow-300 hover:underline break-all"
+              className="text-purple-400 hover:underline break-all"
               target="_blank"
               rel="noopener noreferrer"
             >

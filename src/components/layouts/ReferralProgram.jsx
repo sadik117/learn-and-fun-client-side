@@ -20,7 +20,7 @@ const ReferralProgram = () => {
       number: "3",
       icon: <FaMoneyBillWave className="text-3xl text-green-600" />,
       title: "You Both Earn",
-      description: "Earn 10% of their course rewards plus bonus lottery tickets for successful referrals."
+      description: "Earn 60% of their course rewards plus bonus lottery tickets for successful referrals."
     },
     {
       number: "4",
@@ -69,12 +69,6 @@ const ReferralProgram = () => {
               )}
             </div>
           ))}
-        </div>
-
-        <div className="mt-12 text-center">
-          <button className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-blue-50 transition duration-300">
-            Learn More About Referrals
-          </button>
         </div>
       </div>
     </section>
