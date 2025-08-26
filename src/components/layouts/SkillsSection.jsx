@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 
 const SkillsSection = () => {
   const courses = [
@@ -36,9 +37,9 @@ const SkillsSection = () => {
         </div>
 
         <div className="mt-10 text-center">
-          <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition duration-300">
+          <Link to="/learn" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition duration-300">
             View All Courses
-          </button>
+          </Link>
         </div>
       </div>
     </section>

@@ -122,6 +122,14 @@ export const router = createBrowserRouter([
               </AdminRoute>
             ),
           },
+          {
+            path: "add-course",
+            element: (
+              <AdminRoute>
+                <WithdrawRequests></WithdrawRequests>
+              </AdminRoute>
+            ),
+          },
         ],
       },
       {

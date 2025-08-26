@@ -30,7 +30,7 @@ const HeroSection = () => {
                 Join Now
               </Link>
               <Link 
-                to="/courses" 
+                to="/learn" 
                 className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-full font-semibold text-center hover:bg-blue-50 transition duration-300"
               >
                 Browse Courses
