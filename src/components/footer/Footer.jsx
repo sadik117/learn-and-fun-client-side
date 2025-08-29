@@ -161,7 +161,7 @@ export default function Footer() {
           {/* Bottom bar */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-sm">
             <p className="text-gray-400">
-              © {year} Learn & Fun. All rights reserved.
+              © {year} Learn & Earn. All rights reserved.
             </p>
             <p className="text-gray-400 flex items-center gap-1">
               Made with <FiHeart className="text-rose-500" /> for learners.

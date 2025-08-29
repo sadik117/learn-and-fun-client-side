@@ -2,7 +2,7 @@ import axios from "axios";
 
 const useAxios = () => {
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:3000",
+    baseURL: "https://learn-and-earn-server-side.vercel.app",
     withCredentials: false,
   });
 

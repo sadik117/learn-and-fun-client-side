@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 
 // Create a secure Axios instance
 const axiosSecure = axios.create({
-  baseURL: "http://localhost:3000", 
+  baseURL: "https://learn-and-earn-server-side.vercel.app", 
   withCredentials: true
 });
 
