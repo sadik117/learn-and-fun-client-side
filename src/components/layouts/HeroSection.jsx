@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 
 const HeroSection = () => {
@@ -17,7 +17,7 @@ const HeroSection = () => {
               </span>
             </h1>
 
-            <p className="textarea-lg text-gray-600 max-w-lg">
+            <p className="text-lg text-gray-600 max-w-lg">
               Master in-demand skills through interactive courses and earn rewards while learning. 
               Join thousands of learners who are turning their passion into profit.
             </p>

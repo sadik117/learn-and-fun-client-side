@@ -33,7 +33,7 @@ export default function Footer() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-72 w-[36rem] rounded-full blur-3xl"
+        className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-72 w-[36rem] max-w-[90vw] rounded-full blur-3xl"
         style={{
           background:
             "radial-gradient(80% 80% at 50% 50%, rgba(59,130,246,0.25), rgba(168,85,247,0.12) 60%, transparent 70%)",

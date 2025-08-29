@@ -3,7 +3,7 @@ import { useState, useContext } from "react";
 import { toast } from "react-toastify";
 import Lottie from "lottie-react";
 import loginAnimation from "../assets/login.json";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAxios from "../hooks/useAxios";
 import { AuthContext } from "./AuthProvider";
 
@@ -21,12 +21,14 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      // Normalize email for consistency with backend
+      const emailNormalized = email.trim().toLowerCase();
       // Firebase / custom signIn function
-      const result = await signIn(email, password);
+      const result = await signIn(emailNormalized, password);
       setUser(result.user);
 
       // Request JWT from backend
-      const { data } = await axios.post("/jwt", { email });
+      const { data } = await axios.post("/jwt", { email: emailNormalized });
       if (data.token) {
         localStorage.setItem("access-token", data.token);
       }

@@ -106,9 +106,10 @@ export default function Registration() {
     if (!photoURL) return toast.error("Please upload a profile picture.");
 
     try {
+      const emailNormalized = data.email.trim().toLowerCase();
       // Step 1: Store in backend
       const userInfo = {
-        email: data.email,
+        email: emailNormalized,
         name: data.name,
         photoURL,
         phone: data.phone,
@@ -117,14 +118,16 @@ export default function Registration() {
       };
 
       const response = await axiosSecure.post("/users", userInfo);
-      const token = response.data.token;
+      // Backend may return token for existing users; fetch if missing
+      let token = response?.data?.token;
       if (!token) {
-        toast.error("Failed to register in backend.");
-        return;
+        const jwtRes = await axiosSecure.post("/jwt", { email: emailNormalized });
+        token = jwtRes?.data?.token;
       }
+      if (!token) return toast.error("Failed to get auth token.");
 
       // Step 2: Firebase account
-      const result = await createUser(data.email, data.password);
+      const result = await createUser(emailNormalized, data.password);
 
       // Step 3: Firebase profile update
       await updateUserProfile({ displayName: data.name, photoURL });
@@ -143,7 +146,8 @@ export default function Registration() {
 
       // Rollback: remove DB user if Firebase failed
       try {
-        await axiosSecure.delete(`/users/${getValues("email")}`);
+        const emailForRollback = (getValues("email") || "").trim().toLowerCase();
+        await axiosSecure.delete(`/users/${emailForRollback}`);
       } catch (rollbackErr) {
         console.error("Rollback failed:", rollbackErr);
       }

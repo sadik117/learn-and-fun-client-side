@@ -3,7 +3,6 @@ import { useContext } from 'react';
 import useAxiosSecure from './useAxiosSecure';
 import { AuthContext } from '../Authentication/AuthProvider';
 
-
 const useUserRole = () => {
   const { user, loading: authLoading } = useContext(AuthContext);
   const axiosSecure = useAxiosSecure();
@@ -16,7 +15,8 @@ const useUserRole = () => {
     queryKey: ['userRole', user?.email],
     enabled: !authLoading && !!user?.email,
     queryFn: async () => {
-      const res = await axiosSecure.get(`/users/${user.email}/role`);
+      const email = encodeURIComponent((user.email || '').trim().toLowerCase());
+      const res = await axiosSecure.get(`/users/${email}/role`);
       return res.data.role;
     },
   });

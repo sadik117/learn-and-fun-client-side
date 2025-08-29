@@ -36,6 +36,9 @@ export default function MyProfile() {
 
   if (authLoading || !profile) return <Loading />;
 
+  const displayName = profile.name || user?.displayName || user?.email || "";
+  const avatar = profile.photoURL || user?.photoURL || null;
+
   const referralLink = profile.referralCode
     ? `${window.location.origin}/auth/signup?ref=${profile.referralCode}`
     : null;
@@ -52,10 +55,10 @@ export default function MyProfile() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 text-white py-4 px-4 sm:px-6 lg:px-8">
       {/* Profile Card */}
       <div className="bg-gray-700 p-6 my-5 rounded-2xl shadow-lg flex flex-col items-center">
-        {profile.photoURL && (
+        {avatar && (
           <img
-            src={profile.photoURL}
-            alt={profile.name}
+            src={avatar}
+            alt={displayName}
             className="w-28 h-28 rounded-full border-4 border-white shadow-lg"
           />
         )}
@@ -74,9 +77,9 @@ export default function MyProfile() {
           <span>
             <LuCrown className="mt-0.5"></LuCrown>
           </span>
-          {profile.name}
+          {displayName}
         </h2>
-        <p className="text-gray-200">{profile.email}</p>
+        <p className="text-gray-200">{profile.email || user?.email}</p>
         <p className="mt-2">
           <strong>ID:</strong> {profile.referralCode || "N/A"}
         </p>
@@ -97,7 +100,7 @@ export default function MyProfile() {
               className="ml-2 p-1 bg-gray-700 rounded hover:bg-gray-600"
               title="Copy Link"
             >
-              <FiCopy className="text-white w-4 h-4" />
+              <FiCopy className="text-white w-6 h-5" />
             </button>
             {copied && <span className="text-green-400 text-sm">Copied!</span>}
           </p>
