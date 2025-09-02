@@ -19,6 +19,7 @@ import PaymentPage from "../components/pages/PaymentPage";
 import WithdrawPage from "../components/pages/WithdrawPage";
 import WithdrawRequests from "../Admin/WithdrawalRequests";
 
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -83,7 +84,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/admin-dashboard",
+        path: "/admin-dashboard/*",
         element: (
           <PrivateRoute>
             <AdminDashboard></AdminDashboard>

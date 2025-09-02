@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import {
   FiUsers,
   FiUserPlus,
@@ -98,25 +98,7 @@ const AdminDashboard = () => {
 
         {/* Dashboard Content */}
         <main className="p-6 overflow-y-auto">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <div>
-                  <h2 className="text-xl font-bold mb-4">Overview</h2>
-                  <div className="bg-white p-6 rounded-lg shadow">
-                    <p>Hello Admin Welcome To Your Universe!!</p>
-                  </div>
-                </div>
-              }
-            />
-            <Route path="/members" element={<Members></Members>} />
-            <Route path="/pending" element={<Pendings></Pendings>} />
-            <Route path="/payments" element={<Payments></Payments>} />
-            <Route path="/withdrawals" element={<WithdrawRequests></WithdrawRequests>}></Route>
-            <Route path="/add-course" element={<AddCourse></AddCourse>}></Route>
-            <Route path="/members/:email" element={<MemberProfile />} />
-          </Routes>
+          <Outlet />
         </main>
       </div>
     </div>
