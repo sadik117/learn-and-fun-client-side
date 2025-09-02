@@ -8,7 +8,6 @@ import PrivateRoute from "../Authentication/PrivateRoute";
 import MyProfile from "../components/pages/MyProfile";
 import Learn from "../components/pages/Learn";
 import PlayAndWin from "../components/pages/PlayAndWin";
-import InviteAndEarn from "../components/pages/InviteAndEarn";
 import AdminDashboard from "../Admin/AdminDashboard";
 import AdminRoute from "../Admin/AdminRoute";
 import Members from "../Admin/Members";
@@ -18,6 +17,7 @@ import MemberProfile from "../Admin/MemberProfile";
 import PaymentPage from "../components/pages/PaymentPage";
 import WithdrawPage from "../components/pages/WithdrawPage";
 import WithdrawRequests from "../Admin/WithdrawalRequests";
+import AddCourse from "../Admin/AddCourse";
 
 
 export const router = createBrowserRouter([
@@ -127,7 +127,7 @@ export const router = createBrowserRouter([
             path: "add-course",
             element: (
               <AdminRoute>
-                <WithdrawRequests></WithdrawRequests>
+                <AddCourse></AddCourse>
               </AdminRoute>
             ),
           },
