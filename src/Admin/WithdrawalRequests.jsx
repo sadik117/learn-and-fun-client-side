@@ -43,7 +43,11 @@ export default function WithdrawRequests() {
     }
   };
 
-  if (loading) return <p className="text-white">Loading...</p>;
+  if (loading) return(
+  <div className=" flex justify-center py-8">
+     <p className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></p>;
+  </div>
+  )
 
   return (
     <div className="min-h-screen p-6">

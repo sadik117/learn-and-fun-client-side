@@ -104,7 +104,7 @@ const Navbar = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-white focus:outline-none"
+              className="text-gray-700 focus:outline-none"
             >
               {/* Hamburger / Close Icon */}
               {isMenuOpen ? (

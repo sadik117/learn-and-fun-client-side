@@ -83,22 +83,21 @@ const AdminDashboard = () => {
             </button>
             <h2 className="text-lg font-semibold">Dashboard</h2>
           </div>
-          <div className="flex items-center space-x-4">
-            <button className="p-2 rounded-full hover:bg-gray-100">
-              <FiBell />
-            </button>
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2">
-                <FiUser className="text-blue-600" />
-              </div>
-              <span className="text-sm font-medium">Admin</span>
-            </div>
-          </div>
+         
         </header>
 
         {/* Dashboard Content */}
         <main className="p-6 overflow-y-auto">
+            
+            <div className="flex items-center justify-center mb-2">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                <FiUser className="text-blue-600" />
+              </div>
+              <span className="text-md font-medium">Hello Admin, Welcome to your universe!!</span>
+            </div>
+         
           <Outlet />
+          
         </main>
       </div>
     </div>

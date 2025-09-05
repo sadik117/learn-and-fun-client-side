@@ -86,7 +86,7 @@ export const router = createBrowserRouter([
       {
         path: "/admin-dashboard/*",
         element: (
-          <PrivateRoute>
+          <PrivateRoute>            
             <AdminDashboard></AdminDashboard>
           </PrivateRoute>
         ),

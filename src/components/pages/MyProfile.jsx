@@ -5,6 +5,7 @@ import { FiCopy } from "react-icons/fi";
 import { LuCrown } from "react-icons/lu";
 import { GiCash } from "react-icons/gi";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { Link } from "react-router";
 
 export default function MyProfile() {
   const axiosSecure = useAxiosSecure();
@@ -59,18 +60,18 @@ export default function MyProfile() {
           <img
             src={avatar}
             alt={displayName}
-            className="w-28 h-28 rounded-full border-4 border-white shadow-lg"
+            className="w-28 h-28 rounded-full border-4 border-white shadow-lg mb-2"
           />
         )}
 
         <h1 className="text-lg font-bold flex items-center gap-2">
          <GiCash className="-mr-1"></GiCash> Balance: <span className="text-emerald-500 mt-0.5">{profile.balance}৳</span>
-          <button
-            onClick={() => (window.location.href = "/withdraw")}
+          <Link
+            to="/withdraw"
             className="px-2 py-0.5 ml-2 bg-purple-500 hover:bg-purple-600 rounded-md text-sm font-medium"
           >
             Withdraw
-          </button>
+          </Link>
         </h1>
 
         <h2 className="text-2xl font-bold mt-4 inline-flex gap-1">
