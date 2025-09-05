@@ -172,14 +172,17 @@ const Navbar = () => {
             {user && role === "admin" && (
               <Link
                 to="/admin-dashboard"
-                className="hover:opacity-80 transition"
+                className="text-white py-2 border-b border-white/10 hover:bg-white/10 px-2 rounded"
               >
                 Dashboard
               </Link>
             )}
 
             {user && role == "member" && (
-              <Link to="/myprofile" className="hover:opacity-80 transition">
+              <Link
+                to="/myprofile"
+                className="text-white py-2 border-b border-white/10 hover:bg-white/10 px-2 rounded"
+              >
                 My Profile
               </Link>
             )}
@@ -193,13 +196,22 @@ const Navbar = () => {
                 Logout
               </button>
             ) : (
-              <Link
-                to="/auth/login"
-                className="bg-white text-blue-600 py-2 rounded-full text-center font-semibold mt-2 hover:shadow-md transition"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Login
-              </Link>
+              <>
+                <Link
+                  to="/auth/login"
+                  className="bg-white text-blue-600 py-2 rounded-full text-center font-semibold mt-2 hover:shadow-md transition"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/auth/signup"
+                  className="bg-white text-blue-600 py-2 rounded-full text-center font-semibold mt-2 hover:shadow-md transition"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Registration
+                </Link>
+              </>
             )}
           </div>
         </div>

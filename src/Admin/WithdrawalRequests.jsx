@@ -47,54 +47,70 @@ export default function WithdrawRequests() {
 
   return (
     <div className="min-h-screen p-6">
-      <h1 className="text-2xl font-bold mb-3">Withdrawal Requests</h1>
+      <h1 className="text-2xl font-bold mb-5">Withdrawal Requests</h1>
 
       {requests.length === 0 ? (
-        <p>No withdrawal requests yet.</p>
+        <p className="text-gray-300">No withdrawal requests yet.</p>
       ) : (
         <div className="space-y-4">
           {requests.map((req) => (
             <div
               key={req._id}
-              className="shadow-lg rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between"
+              className="bg-gray-800 text-white shadow-lg rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between"
             >
+              {/* Left section (info) */}
               <div>
-                <p className="font-semibold">{req.name}</p>
+                <p className="font-semibold text-lg">{req.name}</p>
                 <p className="text-sm text-gray-400">{req.email}</p>
+
                 <p className="mt-1">
                   Amount:{" "}
-                  <span className="text-green-400">{req.amount}৳</span>
+                  <span className="font-semibold text-green-400">
+                    {req.amount}৳
+                  </span>
                 </p>
-                <p className="text-sm text-gray-400">
+
+                <p className="text-sm">
+                  Method:{" "}
+                  <span className="font-medium text-blue-400 capitalize">
+                    {req.method}
+                  </span>{" "}
+                  | Phone:{" "}
+                  <span className="font-medium text-gray-300">{req.phone}</span>
+                </p>
+
+                <p className="mt-1 text-sm">
                   Status:{" "}
                   <span
-                    className={
+                    className={`px-2 py-0.5 rounded text-xs font-medium ${
                       req.status === "pending"
-                        ? "text-yellow-400"
+                        ? "bg-yellow-600 text-yellow-100"
                         : req.status === "approved"
-                        ? "text-green-400"
-                        : "text-red-400"
-                    }
+                        ? "bg-green-600 text-green-100"
+                        : "bg-red-600 text-red-100"
+                    }`}
                   >
                     {req.status}
                   </span>
                 </p>
-                <p className="text-xs text-gray-500">
+
+                <p className="text-xs text-gray-400 mt-1">
                   {new Date(req.createdAt).toLocaleString()}
                 </p>
               </div>
 
+              {/* Right section (buttons) */}
               {req.status === "pending" && (
                 <div className="flex gap-2 mt-3 sm:mt-0">
                   <button
                     onClick={() => handleApprove(req._id)}
-                    className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white"
+                    className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white transition"
                   >
                     Approve
                   </button>
                   <button
                     onClick={() => handleReject(req._id)}
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white"
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white transition"
                   >
                     Reject
                   </button>
