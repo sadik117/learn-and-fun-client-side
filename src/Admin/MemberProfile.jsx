@@ -20,18 +20,21 @@ export default function MemberProfile() {
       }
     };
     fetchProfile();
-  }, [email]);
+  }, [email, axiosSecure]);
 
   if (!member) return <Loading />;
+
+  //  Handle photoURL and photoUrl fallback
+  const avatar = member.photoURL || member.photoUrl || null;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto bg-gray-800 rounded-2xl shadow-lg p-6 md:p-10 space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          {member.photoURL ? (
+          {avatar ? (
             <img
-              src={member.photoURL}
+              src={avatar}
               alt={member.name}
               className="w-32 h-32 rounded-full ring-4 ring-teal-500 object-cover"
             />
@@ -40,19 +43,36 @@ export default function MemberProfile() {
               {member.name?.charAt(0)}
             </div>
           )}
+
           <div className="flex-1">
             <h2 className="text-3xl font-bold mb-2">{member.name}</h2>
-            <p className="text-gray-300 mb-1"><strong>Email:</strong> {member.email}</p>
-            {member.phone && <p className="text-gray-300 mb-1"><strong>Phone:</strong> {member.phone}</p>}
-            <p className="text-gray-300 mb-1"><strong>Member ID:</strong> {member.referralCode}</p>
-            {member.referrer && (
+            <p className="text-gray-300 mb-1">
+              <strong>Email:</strong> {member.email}
+            </p>
+            {member.phone && (
               <p className="text-gray-300 mb-1">
-                <strong>Referred By:</strong> {member.referrer.name} ({member.referrer.email})
+                <strong>Phone:</strong> {member.phone}
               </p>
             )}
-            {member.profit !== undefined && (
-              <p className="text-teal-400 font-semibold mt-2">
-                <strong>Total Profit:</strong> ${member.profit.toFixed(2)}
+            <p className="text-gray-300 mb-1">
+              <strong>Member ID:</strong> {member.referralCode}
+            </p>
+            {member.referrer && (
+              <p className="text-gray-300 mb-1">
+                <strong>Referred By:</strong> {member.referrer.name} (
+                {member.referrer.email})
+              </p>
+            )}
+            {/* Joined Date */}
+            {member.createdAt && (
+              <p className="text-gray-300 mb-1">
+                <strong>Joined:</strong>{" "}
+                {new Date(member.createdAt).toLocaleDateString()}
+              </p>
+            )}
+            {member.profits !== undefined && (
+              <p className="text-teal-400 font-medium mt-1">
+                <strong>Total Profit:</strong> ৳{member.profits.toFixed(2)}
               </p>
             )}
           </div>
