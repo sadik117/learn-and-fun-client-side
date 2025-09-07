@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import Lottie from "lottie-react";
 import { motion } from "framer-motion";

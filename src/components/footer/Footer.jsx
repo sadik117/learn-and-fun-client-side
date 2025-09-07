@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/components/layouts/Footer.jsx
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
