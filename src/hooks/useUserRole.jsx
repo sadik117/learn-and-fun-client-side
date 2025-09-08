@@ -1,31 +1,59 @@
-import { useQuery } from '@tanstack/react-query';
-import { useContext } from 'react';
-import useAxiosSecure from './useAxiosSecure';
-import { AuthContext } from '../Authentication/AuthProvider';
+import { useQuery } from "@tanstack/react-query";
+import { useContext, useMemo } from "react";
+import useAxiosSecure from "./useAxiosSecure";
+import { AuthContext } from "../Authentication/AuthProvider";
 
-const useUserRole = () => {
+/**
+ * useUserRole({ referralCode, email, enabled })
+ * - If referralCode is provided, it takes priority.
+ * - Else uses email arg, else falls back to AuthContext user.email.
+ */
+const useUserRole = (args = {}) => {
+  const { email: emailArg = null, referralCode = null, enabled } = args;
   const { user, loading: authLoading } = useContext(AuthContext);
   const axiosSecure = useAxiosSecure();
 
+  // Decide which identifier to use
+  const identifier = useMemo(() => {
+    if (referralCode && referralCode.trim()) {
+      return { kind: "referralCode", value: referralCode.trim() };
+    }
+    const email = (emailArg ?? user?.email ?? "").toString().trim().toLowerCase();
+    if (email) return { kind: "email", value: email };
+    return null;
+  }, [referralCode, emailArg, user?.email]);
+
+  const isEnabled = !authLoading && Boolean(identifier) && (enabled ?? true);
+
   const {
-    data: role = 'user',
-    isLoading: roleLoading,
+    data: role = "user",
+    isLoading,
+    error,
     refetch,
   } = useQuery({
-    queryKey: ['userRole', user?.email || null],
-    enabled: !authLoading && Boolean(user?.email),
+    queryKey: ["userRole", identifier?.kind ?? "none", identifier?.value ?? "none"],
+    enabled: isEnabled,
+    retry: 1, // If request fails, treat as non-admin on next render
     queryFn: async () => {
-      const raw = (user?.email || '').toString();
-      const email = encodeURIComponent(raw.trim().toLowerCase());
-      // Prefer query variant to avoid any path-encoding edge cases
-      const res = await axiosSecure.get(`/users/role?email=${email}`);
-      return res.data?.role || 'user';
+      if (!identifier) return "user";
+
+      // Build params safely (lets axios handle encoding)
+      const params =
+        identifier.kind === "referralCode"
+          ? { referralCode: identifier.value.toUpperCase() }
+          : { email: identifier.value };
+
+      const res = await axiosSecure.get("/users/role", { params });
+      return res.data?.role || "user";
     },
-    // If request fails for any reason, treat as non-admin
-    retry: 1,
   });
 
-  return { role, roleLoading: authLoading || roleLoading, refetch };
+  return {
+    role,
+    roleLoading: authLoading || isLoading,
+    error,
+    refetch,
+  };
 };
 
 export default useUserRole;

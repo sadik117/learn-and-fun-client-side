@@ -8,6 +8,7 @@ import registerAnimation from "../assets/registration.json";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../Authentication/AuthProvider";
 import useAxiosSecure from "../hooks/useAxiosSecure";
+// (reverted) no public axios usage
 
 export default function Registration() {
   const { createUser, setUser, updateUserProfile } = useContext(AuthContext);
@@ -64,7 +65,7 @@ export default function Registration() {
     }
   };
 
-  // Send OTP
+  // Send OTP (reverted to secure instance)
   const onSendOtp = async () => {
     const email = getValues("email");
     if (!email) return toast.error("Please enter your email first");
@@ -79,7 +80,7 @@ export default function Registration() {
     }
   };
 
-  // Verify OTP
+  // Verify OTP (reverted to secure instance)
   const onVerifyOtp = async () => {
     const email = getValues("email");
     if (!otp) return toast.error("Please enter the OTP");
@@ -148,7 +149,7 @@ export default function Registration() {
       // Rollback: remove DB user if Firebase failed
       try {
         const emailForRollback = (getValues("email") || "").trim().toLowerCase();
-        await axiosSecure.delete(`/users/${emailForRollback}`);
+        await axiosSecure.delete(`/users/${encodeURIComponent(emailForRollback)}`);
       } catch (rollbackErr) {
         console.error("Rollback failed:", rollbackErr);
       }
