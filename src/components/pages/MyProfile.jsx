@@ -5,7 +5,7 @@ import { FiCopy } from "react-icons/fi";
 import { LuCrown } from "react-icons/lu";
 import { GiCash } from "react-icons/gi";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 export default function MyProfile() {
   const axiosSecure = useAxiosSecure();

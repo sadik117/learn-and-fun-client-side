@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 // Build base URL with optional API prefix (e.g., /api or /api/v1)
 const buildBaseURL = () => {

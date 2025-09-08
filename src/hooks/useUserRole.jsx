@@ -12,13 +12,17 @@ const useUserRole = () => {
     isLoading: roleLoading,
     refetch,
   } = useQuery({
-    queryKey: ['userRole', user?.email],
-    enabled: !authLoading && !!user?.email,
+    queryKey: ['userRole', user?.email || null],
+    enabled: !authLoading && Boolean(user?.email),
     queryFn: async () => {
-      const email = encodeURIComponent((user.email || '').trim().toLowerCase());
-      const res = await axiosSecure.get(`/users/role/${email}`);
-      return res.data.role;
+      const raw = (user?.email || '').toString();
+      const email = encodeURIComponent(raw.trim().toLowerCase());
+      // Prefer query variant to avoid any path-encoding edge cases
+      const res = await axiosSecure.get(`/users/role?email=${email}`);
+      return res.data?.role || 'user';
     },
+    // If request fails for any reason, treat as non-admin
+    retry: 1,
   });
 
   return { role, roleLoading: authLoading || roleLoading, refetch };
