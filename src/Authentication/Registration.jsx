@@ -8,6 +8,7 @@ import registerAnimation from "../assets/registration.json";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../Authentication/AuthProvider";
 import useAxiosSecure from "../hooks/useAxiosSecure";
+
 // (reverted) no public axios usage
 
 export default function Registration() {
