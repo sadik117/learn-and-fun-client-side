@@ -18,6 +18,7 @@ import PaymentPage from "../components/pages/PaymentPage";
 import WithdrawPage from "../components/pages/WithdrawPage";
 import WithdrawRequests from "../Admin/WithdrawalRequests";
 import AddCourse from "../Admin/AddCourse";
+import MemberDetails from "../components/pages/MemberDetails";
 
 
 export const router = createBrowserRouter([
@@ -140,6 +141,10 @@ export const router = createBrowserRouter([
             <MemberProfile></MemberProfile>
           </AdminRoute>
         ),
+      },
+      {
+        path:"/member-details/:email",
+        Component: MemberDetails
       },
     ],
   },
