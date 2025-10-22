@@ -1,6 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from "recharts";
 import {
   FiUser,
   FiUsers,
@@ -11,11 +18,13 @@ import {
   FiDollarSign,
 } from "react-icons/fi";
 import { ImSpinner8 } from "react-icons/im";
+import { AuthContext } from "../../Authentication/AuthProvider";
 
 const MemberDetails = () => {
   const { email } = useParams();
   const [member, setMember] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useContext(AuthContext);
 
   const fallbackImage = "https://i.ibb.co/CsNxKRrN/default-avatar.png";
 
@@ -23,7 +32,9 @@ const MemberDetails = () => {
     const fetchMember = async () => {
       try {
         const res = await fetch(
-          `https://learn-and-earn-server-side.vercel.app/users/${encodeURIComponent(email)}`
+          `https://learn-and-earn-server-side.vercel.app/users/${encodeURIComponent(
+            email
+          )}`
         );
         const data = await res.json();
         setMember(data);
@@ -36,19 +47,17 @@ const MemberDetails = () => {
     fetchMember();
   }, [email]);
 
+  // --- Prepare Calculations ---
+  const totalTeam = member?.totalTeam || member?.team || 0;
+  const directTeam = member?.teamMembers?.length || 0;
+  const profits = member?.profits || 0;
+
   const teamData = [
-    { name: "Direct Team", value: member?.teamMembers?.length || 0 },
-    {
-      name: "Total Network",
-      value: Math.max(
-        (member?.totalTeam || member?.team || 0) -
-          (member?.teamMembers?.length || 0),
-        0
-      ),
-    },
+    { name: "Direct Team", value: directTeam },
+    { name: "Total Network", value: Math.max(totalTeam - directTeam, 0) },
   ];
 
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+  const COLORS = ["#0088FE", "#00C49F"];
 
   const createdAtDate = member?.createdAt ? new Date(member.createdAt) : null;
   const createdAtText =
@@ -56,84 +65,112 @@ const MemberDetails = () => {
       ? createdAtDate.toLocaleDateString()
       : "N/A";
 
+  // --- Dynamic Badges Logic ---
+  const getAchievementBadge = () => {
+    if (totalTeam > 50)
+      return {
+        level: "Gold",
+        icon: <FiAward />,
+        color: "bg-yellow-100 border-yellow-400 text-yellow-700",
+      };
+    if (totalTeam > 10)
+      return {
+        level: "Silver",
+        icon: <FiAward />,
+        color: "bg-gray-100 border-gray-400 text-gray-700",
+      };
+    if (totalTeam > 0)
+      return {
+        level: "Bronze",
+        icon: <FiAward />,
+        color: "bg-orange-100 border-orange-400 text-orange-700",
+      };
+    return {
+      level: "Starter",
+      icon: <FiUser />,
+      color: "bg-gray-200 border-gray-400 text-gray-600",
+    };
+  };
+
+  const getEarningBadge = () => {
+    if (profits > 5000)
+      return {
+        text: "Top Earner",
+        icon: <FiAward />,
+        color: "bg-purple-100 border-purple-400 text-purple-700",
+      };
+    if (profits > 1000)
+      return {
+        text: "Growing Earner",
+        icon: <FiDollarSign />,
+        color: "bg-blue-100 border-blue-400 text-blue-700",
+      };
+    if (profits > 0)
+      return {
+        text: "Beginner Earner",
+        icon: <FiTrendingUp />,
+        color: "bg-green-100 border-green-400 text-green-700",
+      };
+    return {
+      text: "No Earnings Yet",
+      icon: <FiDollarSign />,
+      color: "bg-gray-100 border-gray-400 text-gray-700",
+    };
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <ImSpinner8 className="animate-spin text-4xl text-blue-600" />
-        <p className="ml-4 text-xl text-gray-600">Loading member details...</p>
       </div>
     );
   }
 
   if (!member) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <FiUser className="text-6xl text-red-400 mb-4" />
-        <h2 className="text-2xl font-bold text-red-600">Member Not Found</h2>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <h2 className="text-2xl text-red-500">Member Not Found</h2>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Member Profile</h1>
-          <p className="text-gray-600 mt-2">
-            Detailed overview of member performance and statistics
-          </p>
-        </div>
+        <h1 className="text-3xl font-bold mb-2">Member Profile</h1>
+        <p className="text-gray-600 mb-6">
+          Detailed overview of member performance and statistics
+        </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* LEFT COLUMN */}
-          <div className="lg:col-span-1 space-y-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex flex-col items-center text-center">
-                <img
-                  src={member.photoURL || fallbackImage}
-                  onError={(e) => (e.target.src = fallbackImage)}
-                  alt="Profile"
-                  className="w-24 h-24 rounded-full border-4 border-blue-100 mb-4 object-cover"
-                />
-                <h2 className="text-xl font-bold text-gray-900">
-                  {member.name || "No Name"}
-                </h2>
-                <div className="flex items-center mt-1 text-gray-600 text-sm">
-                  <FiMail className="mr-2" /> {member.email}
-                </div>
-              </div>
+          {/*  Left Profile */}
+          <div className="bg-white rounded-xl shadow-sm border p-6 space-y-6">
+            <div className="text-center">
+              <img
+                src={user?.photoURL || fallbackImage}
+                onError={(e) => (e.target.src = fallbackImage)}
+                alt="Profile"
+                className="w-24 h-24 object-cover rounded-full border-4 border-blue-100 mx-auto mb-4"
+              />
+              <h2 className="text-xl font-bold">{member.name || "No Name"}</h2>
+              <p className="text-gray-600 text-sm flex items-center justify-center">
+                <FiMail className="mr-2" /> {member.email}
+              </p>
+            </div>
 
-              {/* QUICK STATS */}
-              <div className="mt-6 space-y-4">
-                <InfoRow
-                  icon={<FiUsers />}
-                  label="Direct Team"
-                  value={member.teamMembers?.length || 0}
-                />
-                <InfoRow
-                  icon={<FiTrendingUp />}
-                  label="Total Network"
-                  value={member.totalTeam || member.team || 0}
-                />
-                <InfoRow
-                  icon={<FiDollarSign />}
-                  label="Profits"
-                  value={`$৳{member.profits || 0}`}
-                />
-                <InfoRow
-                  icon={<FiCalendar />}
-                  label="Member Since"
-                  value={createdAtText}
-                />
-              </div>
+            <div className="space-y-4">
+              <InfoRow icon={<FiUsers />} label="Direct Team" value={directTeam} />
+              <InfoRow icon={<FiTrendingUp />} label="Total Network" value={totalTeam} />
+              <InfoRow icon={<FiDollarSign />} label="Profits" value={`৳${profits}`} />
+              <InfoRow icon={<FiCalendar />} label="Member Since" value={createdAtText} />
             </div>
           </div>
 
-          {/* RIGHT COLUMN */}
+          {/*Charts + Badges */}
           <div className="lg:col-span-2 space-y-6">
-            {/* TEAM CHART */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            {/* Team Chart */}
+            <div className="bg-white rounded-xl shadow-sm border p-6">
+              <h3 className="text-lg font-semibold flex items-center mb-4">
                 <FiUsers className="mr-2 text-blue-500" /> Team Structure
               </h3>
               <div className="h-64">
@@ -143,15 +180,14 @@ const MemberDetails = () => {
                       data={teamData}
                       cx="50%"
                       cy="50%"
-                      labelLine={false}
-                      label={({ name, value }) => `${name}: ${value}`}
-                      outerRadius={80}
+                      outerRadius={85}
                       dataKey="value"
+                      label={({ name, value }) => `${name}: ${value}`}
                     >
-                      {teamData.map((entry, index) => (
+                      {teamData.map((entry, i) => (
                         <Cell
-                          key={index}
-                          fill={COLORS[index % COLORS.length]}
+                          key={i}
+                          fill={COLORS[i % COLORS.length]}
                         />
                       ))}
                     </Pie>
@@ -160,9 +196,22 @@ const MemberDetails = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <p className="text-center text-gray-600 mt-3">
-                Total Network Size: {member.totalTeam || member.team || 0}
-              </p>
+            </div>
+
+            {/* Dynamic Achievement & Earnings */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <BadgeCard
+                icon={getAchievementBadge().icon}
+                title="Achievement Level"
+                value={getAchievementBadge().level}
+                color={getAchievementBadge().color}
+              />
+              <BadgeCard
+                icon={getEarningBadge().icon}
+                title="Earning Status"
+                value={getEarningBadge().text}
+                color={getEarningBadge().color}
+              />
             </div>
           </div>
         </div>
@@ -172,11 +221,19 @@ const MemberDetails = () => {
 };
 
 const InfoRow = ({ icon, label, value }) => (
-  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-    <div className="flex items-center text-gray-700">
-      <span className="mr-3">{icon}</span> {label}
+  <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+    <span className="flex items-center text-gray-700">{icon} <span className="ml-2">{label}</span></span>
+    <span className="font-bold">{value}</span>
+  </div>
+);
+
+const BadgeCard = ({ icon, title, value, color }) => (
+  <div className={`rounded-xl border p-4 flex items-center space-x-3 shadow-sm ${color}`}>
+    <span className="text-xl">{icon}</span>
+    <div>
+      <p className="text-sm">{title}</p>
+      <p className="font-bold">{value}</p>
     </div>
-    <span className="font-bold text-gray-900">{value}</span>
   </div>
 );
 
