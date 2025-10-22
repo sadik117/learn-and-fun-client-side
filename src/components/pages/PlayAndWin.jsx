@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { Link } from "react-router";
 
 const PlayAndWin = () => {
   const axiosSecure = useAxiosSecure();
@@ -16,7 +17,7 @@ const PlayAndWin = () => {
 
   const slotItems = ["🍒", "🍋", "🍇", "🍊", "7️⃣", "⭐", "💎"];
 
-  // Fetch user profile (correct endpoint)
+  // Fetch user profile
   const fetchUser = async () => {
     try {
       const res = await axiosSecure.get("/my-profile");
@@ -29,10 +30,8 @@ const PlayAndWin = () => {
 
   useEffect(() => {
     fetchUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Random roll during spin
   const randomSlots = () => [
     slotItems[Math.floor(Math.random() * slotItems.length)],
     slotItems[Math.floor(Math.random() * slotItems.length)],
@@ -46,7 +45,6 @@ const PlayAndWin = () => {
     setIsLoss(false);
     setSpinning(true);
 
-    // Spin animation
     const spinInterval = setInterval(() => {
       setSlots(randomSlots());
     }, 120);
@@ -60,7 +58,6 @@ const PlayAndWin = () => {
         setLoading(false);
 
         if (res.data?.success) {
-          // ✅ Always show 💎💎💎 if win; else show backend slots (or random fallback)
           const finalSlots = res.data.win
             ? ["💎", "💎", "💎"]
             : res.data.slots || randomSlots();
@@ -70,15 +67,9 @@ const PlayAndWin = () => {
           setFreePlays(res.data.freePlaysLeft ?? 0);
           setMessage(res.data.message || "");
 
-          if (res.data.win) {
-            setIsWin(true);
-            setIsLoss(false);
-          } else {
-            setIsLoss(true);
-            setIsWin(false);
-          }
+          if (res.data.win) setIsWin(true);
+          else setIsLoss(true);
 
-          // Hard refresh (optional) to ensure sync
           fetchUser();
         } else {
           setMessage(res.data?.message || "Something went wrong");
@@ -89,14 +80,11 @@ const PlayAndWin = () => {
       clearInterval(spinInterval);
       setSpinning(false);
       setLoading(false);
-      setMessage(
-        "Error: " + (error?.response?.data?.message || "Failed to play")
-      );
+      setMessage("Error: " + (error?.response?.data?.message || "Failed to play"));
       setIsLoss(true);
     }
   };
 
-  // Glow around card based on result
   const resultGlow =
     !spinning && (isWin || isLoss)
       ? isWin
@@ -151,7 +139,7 @@ const PlayAndWin = () => {
           ))}
         </div>
 
-        {/* CTA: Free first, then paid */}
+        {/* CTA */}
         <motion.div whileTap={{ scale: 0.97 }}>
           <button
             className={`w-full py-3 text-lg font-semibold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors
@@ -163,7 +151,6 @@ const PlayAndWin = () => {
             `}
             onClick={handlePlay}
             disabled={loading || spinning}
-            title={freePlays > 0 ? "Use a free play" : "Cost: 50৳"}
           >
             {loading
               ? "Playing..."
@@ -171,6 +158,16 @@ const PlayAndWin = () => {
               ? "Play Free (0৳)"
               : "Play (50৳)"}
           </button>
+        </motion.div>
+
+        {/* Dino Game Button */}
+        <motion.div whileTap={{ scale: 0.97 }}>
+          <Link
+            to="/dinogame"
+            className="block w-full py-3 text-lg font-semibold rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg mt-4 transition"
+          >
+            🦖 Play Dino Game Free
+          </Link>
         </motion.div>
 
         {/* Result message */}

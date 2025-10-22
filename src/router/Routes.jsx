@@ -19,6 +19,7 @@ import WithdrawPage from "../components/pages/WithdrawPage";
 import WithdrawRequests from "../Admin/WithdrawalRequests";
 import AddCourse from "../Admin/AddCourse";
 import MemberDetails from "../components/pages/MemberDetails";
+import DinoGame from "../components/layouts/DinoGame";
 
 
 export const router = createBrowserRouter([
@@ -61,10 +62,18 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/playNwin",
+        path: "/playgames",
         element: (
           <PrivateRoute>
             <PlayAndWin></PlayAndWin>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/dinogame",
+        element: (
+          <PrivateRoute>
+            <DinoGame></DinoGame>
           </PrivateRoute>
         ),
       },

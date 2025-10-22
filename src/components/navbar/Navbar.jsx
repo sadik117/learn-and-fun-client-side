@@ -109,7 +109,7 @@ const Navbar = () => {
               <FiBook className="mr-1" />
               Learn
             </Link>
-            <Link to="/playNwin" className="hover:text-yellow-400 transition duration-200 flex items-center">
+            <Link to="/playgames" className="hover:text-yellow-400 transition duration-200 flex items-center">
               <FiAward className="mr-1" />
               Play & Win
             </Link>
@@ -241,7 +241,7 @@ const Navbar = () => {
                 Learn
               </Link>
               <Link
-                to="/playNwin"
+                to="/playgames"
                 onClick={() => setIsMenuOpen(false)}
                 className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition duration-200"
               >
