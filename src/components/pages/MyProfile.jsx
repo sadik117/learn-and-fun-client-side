@@ -5,7 +5,7 @@ import { FiCopy } from "react-icons/fi";
 import { LuCrown } from "react-icons/lu";
 import { GiCash } from "react-icons/gi";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { toast } from "react-toastify"; 
+import { toast } from "react-toastify";
 import { Link } from "react-router";
 import useAxios from "../../hooks/useAxios";
 
@@ -57,40 +57,37 @@ export default function MyProfile() {
   };
 
   //  Handle image upload
-  const handleImageUpload = async (e) => {
-    const image = e.target.files[0];
-    if (!image) return toast.error("Please select an image.");
-
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
     const formData = new FormData();
-    formData.append("image", image);
-    setUploading(true);
+    formData.append("image", file);
 
     try {
+      toast.info("Uploading photo...");
       const res = await fetch(
-        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
-        { method: "POST", body: formData }
+        `https://api.imgbb.com/1/upload?key=${
+          import.meta.env.VITE_IMGBB_API_KEY
+        }`,
+        {
+          method: "POST",
+          body: formData,
+        }
       );
       const data = await res.json();
-
       if (data.success) {
         const imageUrl = data.data.url;
 
-        //  Update backend profile photo
-        await axios.patch("/update-photo", { photoURL: imageUrl });
-
-        //  Update frontend state
-        setProfile((prev) => ({ ...prev, photoURL: imageUrl }));
-        setUser((prev) => ({ ...prev, photoURL: imageUrl }));
-
+        // Now update in backend
+        await axiosSecure.patch("/users/update-photo", { photoURL: imageUrl });
         toast.success("Profile photo updated!");
+        setProfile((prev) => ({ ...prev, photoURL: imageUrl }));
       } else {
-        toast.error("Failed to upload image.");
+        toast.error("Upload failed!");
       }
     } catch (err) {
+      toast.error("Error uploading image!");
       console.error(err);
-      toast.error("Upload error occurred.");
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -107,20 +104,13 @@ export default function MyProfile() {
         )}
 
         {/*  New Image Upload Section */}
-        <div className="mt-2">
-          <label
-            htmlFor="photo-upload"
-            className="cursor-pointer bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded-md text-sm font-medium"
-          >
-            {uploading ? "Uploading..." : "Change Photo"}
-          </label>
+        <div className="mt-3">
+          <label className="block text-sm mb-1">Change Profile Photo</label>
           <input
-            id="photo-upload"
             type="file"
             accept="image/*"
-            className="hidden"
-            onChange={handleImageUpload}
-            disabled={uploading}
+            onChange={handleImageChange}
+            className="text-sm file:bg-purple-600 file:text-white file:border-none file:px-3 file:py-1.5 rounded-md bg-gray-800 border border-gray-600"
           />
         </div>
 
