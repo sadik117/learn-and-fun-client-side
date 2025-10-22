@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   PieChart,
@@ -18,13 +18,11 @@ import {
   FiDollarSign,
 } from "react-icons/fi";
 import { ImSpinner8 } from "react-icons/im";
-import { AuthContext } from "../../Authentication/AuthProvider";
 
 const MemberDetails = () => {
   const { email } = useParams();
   const [member, setMember] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { user } = useContext(AuthContext);
 
   const fallbackImage = "https://i.ibb.co/CsNxKRrN/default-avatar.png";
 
@@ -147,7 +145,7 @@ const MemberDetails = () => {
           <div className="bg-white rounded-xl shadow-sm border p-6 space-y-6">
             <div className="text-center">
               <img
-                src={user?.photoURL || fallbackImage}
+                src={member?.photoURL || fallbackImage}
                 onError={(e) => (e.target.src = fallbackImage)}
                 alt="Profile"
                 className="w-24 h-24 object-cover rounded-full border-4 border-blue-100 mx-auto mb-4"
