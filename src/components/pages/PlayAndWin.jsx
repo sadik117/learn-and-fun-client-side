@@ -93,7 +93,8 @@ const PlayAndWin = () => {
       : "";
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 p-6">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 p-6 space-y-12">
+      {/* 🎰 Lottery Section */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -160,17 +161,7 @@ const PlayAndWin = () => {
           </button>
         </motion.div>
 
-        {/* Dino Game Button */}
-        <motion.div whileTap={{ scale: 0.97 }}>
-          <Link
-            to="/dinogame"
-            className="block w-full py-3 text-lg font-semibold rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg mt-4 transition"
-          >
-            🦖 Play Dino Game Free
-          </Link>
-        </motion.div>
-
-        {/* Result message */}
+        {/* Result Message */}
         {message && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -184,6 +175,33 @@ const PlayAndWin = () => {
             {message}
           </motion.div>
         )}
+      </motion.div>
+
+      {/* 🦖 Dino Game Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden text-center"
+      >
+        <img
+          src="https://i.ibb.co.com/8DjJygQK/google-dinosaur-game.jpg"
+          alt="Play Dino Game"
+          className="w-full h-56 object-cover"
+        />
+        <div className="p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-3">
+            🦖 Play Dino Game
+          </h2>
+          <p className="text-gray-500 text-sm mb-4">
+            Jump over obstacles and beat your high score — no money required!
+          </p>
+          <Link
+            to="/dinogame"
+            className="block w-full py-3 text-lg font-semibold rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg transition"
+          >
+            Play Now
+          </Link>
+        </div>
       </motion.div>
     </div>
   );

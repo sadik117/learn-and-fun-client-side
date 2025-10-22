@@ -77,7 +77,7 @@ export default function MyProfile() {
       if (data.success) {
         const imageUrl = data.data.url;
 
-        // ✅ Update to backend with email + photoURL
+        // Update to backend with email + photoURL
         await axiosSecure.patch("/users/update-photo", {
           email: profile.email,
           photoURL: imageUrl,
@@ -106,14 +106,22 @@ export default function MyProfile() {
           />
         )}
 
-        {/*  New Image Upload Section */}
+        {/* Profile Photo Upload Section */}
         <div className="mt-3">
-          <label className="block text-sm mb-1">Change Profile Photo</label>
+          <label
+            htmlFor="photo-upload"
+            className="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-200 inline-block"
+          >
+            {uploading ? "Uploading..." : "Upload New Photo"}
+          </label>
+
           <input
+            id="photo-upload"
             type="file"
             accept="image/*"
             onChange={handleImageChange}
-            className="text-sm file:bg-purple-600 file:text-white file:border-none file:px-3 file:py-1.5 rounded-md bg-gray-800 border border-gray-600"
+            disabled={uploading}
+            className="hidden"
           />
         </div>
 
