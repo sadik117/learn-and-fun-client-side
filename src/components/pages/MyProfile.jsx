@@ -5,16 +5,18 @@ import { FiCopy } from "react-icons/fi";
 import { LuCrown } from "react-icons/lu";
 import { GiCash } from "react-icons/gi";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { Link } from "react-router-dom";
+import { toast } from "react-toastify"; 
+import { Link } from "react-router";
 
 export default function MyProfile() {
   const axiosSecure = useAxiosSecure();
-  const { user, loading: authLoading } = useContext(AuthContext);
+  const { user, loading: authLoading, setUser } = useContext(AuthContext);
 
   const [profile, setProfile] = useState(null);
   const [team, setTeam] = useState([]);
   const [referrer, setReferrer] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!authLoading && user?.email) {
@@ -52,6 +54,44 @@ export default function MyProfile() {
     }
   };
 
+  //  Handle image upload
+  const handleImageUpload = async (e) => {
+    const image = e.target.files[0];
+    if (!image) return toast.error("Please select an image.");
+
+    const formData = new FormData();
+    formData.append("image", image);
+    setUploading(true);
+
+    try {
+      const res = await fetch(
+        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
+        { method: "POST", body: formData }
+      );
+      const data = await res.json();
+
+      if (data.success) {
+        const imageUrl = data.data.url;
+
+        //  Update backend profile photo
+        await axiosSecure.patch("/update-photo", { photoURL: imageUrl });
+
+        //  Update frontend state
+        setProfile((prev) => ({ ...prev, photoURL: imageUrl }));
+        setUser((prev) => ({ ...prev, photoURL: imageUrl }));
+
+        toast.success("Profile photo updated!");
+      } else {
+        toast.error("Failed to upload image.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Upload error occurred.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 text-white py-4 px-4 sm:px-6 lg:px-8">
       {/* Profile Card */}
@@ -60,12 +100,32 @@ export default function MyProfile() {
           <img
             src={avatar}
             alt={displayName}
-            className="w-28 h-28 rounded-full border-4 border-white shadow-lg mb-2"
+            className="w-28 h-28 rounded-full border-4 border-white shadow-lg mb-2 object-cover"
           />
         )}
 
-        <h1 className="text-lg font-bold flex items-center gap-2">
-         <GiCash className="-mr-1"></GiCash> Balance: <span className="text-emerald-500 mt-0.5">{profile.balance}৳</span>
+        {/*  New Image Upload Section */}
+        <div className="mt-2">
+          <label
+            htmlFor="photo-upload"
+            className="cursor-pointer bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded-md text-sm font-medium"
+          >
+            {uploading ? "Uploading..." : "Change Photo"}
+          </label>
+          <input
+            id="photo-upload"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageUpload}
+            disabled={uploading}
+          />
+        </div>
+
+        <h1 className="text-lg font-bold flex items-center gap-2 mt-3">
+          <GiCash className="-mr-1" />
+          Balance:{" "}
+          <span className="text-emerald-500 mt-0.5">{profile.balance}৳</span>
           <Link
             to="/withdraw"
             className="px-2 py-0.5 ml-2 bg-purple-500 hover:bg-purple-600 rounded-md text-sm font-medium"
@@ -75,9 +135,7 @@ export default function MyProfile() {
         </h1>
 
         <h2 className="text-2xl font-bold mt-4 inline-flex gap-1">
-          <span>
-            <LuCrown className="mt-0.5"></LuCrown>
-          </span>
+          <LuCrown className="mt-0.5" />
           {displayName}
         </h2>
         <p className="text-gray-200">{profile.email || user?.email}</p>
