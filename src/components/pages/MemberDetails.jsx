@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { 
-  FiUser, 
-  FiUsers, 
-  FiMail, 
+import {
+  FiUser,
+  FiUsers,
+  FiMail,
   FiCalendar,
   FiAward,
   FiTrendingUp,
-  FiDollarSign
+  FiDollarSign,
 } from "react-icons/fi";
 import { ImSpinner8 } from "react-icons/im";
 
@@ -36,19 +36,25 @@ const MemberDetails = () => {
     fetchMember();
   }, [email]);
 
-  // Team chart data
   const teamData = [
     { name: "Direct Team", value: member?.teamMembers?.length || 0 },
-    { name: "Total Network", value: Math.max((member?.totalTeam || member?.team || 0) - (member?.teamMembers?.length || 0), 0) }
+    {
+      name: "Total Network",
+      value: Math.max(
+        (member?.totalTeam || member?.team || 0) -
+          (member?.teamMembers?.length || 0),
+        0
+      ),
+    },
   ];
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-  //  Member Since Date Fix
   const createdAtDate = member?.createdAt ? new Date(member.createdAt) : null;
-  const createdAtText = createdAtDate && !isNaN(createdAtDate.getTime()) 
-    ? createdAtDate.toLocaleDateString() 
-    : "N/A";
+  const createdAtText =
+    createdAtDate && !isNaN(createdAtDate.getTime())
+      ? createdAtDate.toLocaleDateString()
+      : "N/A";
 
   if (loading) {
     return (
@@ -73,11 +79,13 @@ const MemberDetails = () => {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Member Profile</h1>
-          <p className="text-gray-600 mt-2">Detailed overview of member performance and statistics</p>
+          <p className="text-gray-600 mt-2">
+            Detailed overview of member performance and statistics
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column */}
+          {/* LEFT COLUMN */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex flex-col items-center text-center">
@@ -87,25 +95,43 @@ const MemberDetails = () => {
                   alt="Profile"
                   className="w-24 h-24 rounded-full border-4 border-blue-100 mb-4 object-cover"
                 />
-                <h2 className="text-xl font-bold text-gray-900">{member.name || "No Name"}</h2>
+                <h2 className="text-xl font-bold text-gray-900">
+                  {member.name || "No Name"}
+                </h2>
                 <div className="flex items-center mt-1 text-gray-600 text-sm">
                   <FiMail className="mr-2" /> {member.email}
                 </div>
               </div>
 
-              {/*  Quick Stats with Profits + Balance */}
+              {/* QUICK STATS */}
               <div className="mt-6 space-y-4">
-                <InfoRow icon={<FiUsers />} label="Direct Team" value={member.teamMembers?.length || 0} />
-                <InfoRow icon={<FiTrendingUp />} label="Total Network" value={member.totalTeam || member.team || 0} />
-                <InfoRow icon={<FiDollarSign />} label="Profits" value={`$${member.profits || 0}`} />
-                <InfoRow icon={<FiCalendar />} label="Member Since" value={createdAtText} />
+                <InfoRow
+                  icon={<FiUsers />}
+                  label="Direct Team"
+                  value={member.teamMembers?.length || 0}
+                />
+                <InfoRow
+                  icon={<FiTrendingUp />}
+                  label="Total Network"
+                  value={member.totalTeam || member.team || 0}
+                />
+                <InfoRow
+                  icon={<FiDollarSign />}
+                  label="Profits"
+                  value={`$৳{member.profits || 0}`}
+                />
+                <InfoRow
+                  icon={<FiCalendar />}
+                  label="Member Since"
+                  value={createdAtText}
+                />
               </div>
             </div>
           </div>
 
-          {/* Right Side - Charts + Team */}
+          {/* RIGHT COLUMN */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Team Pie Chart */}
+            {/* TEAM CHART */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <FiUsers className="mr-2 text-blue-500" /> Team Structure
@@ -123,7 +149,10 @@ const MemberDetails = () => {
                       dataKey="value"
                     >
                       {teamData.map((entry, index) => (
-                        <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                        <Cell
+                          key={index}
+                          fill={COLORS[index % COLORS.length]}
+                        />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -135,31 +164,6 @@ const MemberDetails = () => {
                 Total Network Size: {member.totalTeam || member.team || 0}
               </p>
             </div>
-
-            {/* Direct Team Members */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold mb-4">Direct Team Members</h3>
-              {member.teamDetails?.length ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {member.teamDetails.map((tm) => (
-                    <div key={tm.email} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                      <img
-                        src={tm.photoURL || fallbackImage}
-                        onError={(e) => (e.target.src = fallbackImage)}
-                        alt="Team Member"
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                      <div>
-                        <p className="font-semibold">{tm.name}</p>
-                        <p className="text-sm text-gray-500">{tm.email}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500">No direct team members.</p>
-              )}
-            </div>
           </div>
         </div>
       </div>
@@ -167,7 +171,6 @@ const MemberDetails = () => {
   );
 };
 
-//Reusable Component for Info Rows
 const InfoRow = ({ icon, label, value }) => (
   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
     <div className="flex items-center text-gray-700">
