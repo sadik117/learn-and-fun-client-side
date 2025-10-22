@@ -7,9 +7,11 @@ import { GiCash } from "react-icons/gi";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { toast } from "react-toastify"; 
 import { Link } from "react-router";
+import useAxios from "../../hooks/useAxios";
 
 export default function MyProfile() {
   const axiosSecure = useAxiosSecure();
+  const axios = useAxios();
   const { user, loading: authLoading, setUser } = useContext(AuthContext);
 
   const [profile, setProfile] = useState(null);
@@ -74,7 +76,7 @@ export default function MyProfile() {
         const imageUrl = data.data.url;
 
         //  Update backend profile photo
-        await axiosSecure.patch("/update-photo", { photoURL: imageUrl });
+        await axios.patch("/update-photo", { photoURL: imageUrl });
 
         //  Update frontend state
         setProfile((prev) => ({ ...prev, photoURL: imageUrl }));
