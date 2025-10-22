@@ -60,6 +60,7 @@ export default function MyProfile() {
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     const formData = new FormData();
     formData.append("image", file);
 
@@ -69,17 +70,19 @@ export default function MyProfile() {
         `https://api.imgbb.com/1/upload?key=${
           import.meta.env.VITE_IMGBB_API_KEY
         }`,
-        {
-          method: "POST",
-          body: formData,
-        }
+        { method: "POST", body: formData }
       );
       const data = await res.json();
+
       if (data.success) {
         const imageUrl = data.data.url;
 
-        // Now update in backend
-        await axiosSecure.patch("/users/update-photo", { photoURL: imageUrl });
+        // ✅ Update to backend with email + photoURL
+        await axiosSecure.patch("/users/update-photo", {
+          email: profile.email,
+          photoURL: imageUrl,
+        });
+
         toast.success("Profile photo updated!");
         setProfile((prev) => ({ ...prev, photoURL: imageUrl }));
       } else {
