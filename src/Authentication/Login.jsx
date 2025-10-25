@@ -7,7 +7,6 @@ import loginAnimation from "../assets/login.json";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAxios from "../hooks/useAxios";
 import { AuthContext } from "./AuthProvider";
-import { Helmet } from "react-helmet-async";
 
 export default function Login() {
   const { setUser, signIn } = useContext(AuthContext);

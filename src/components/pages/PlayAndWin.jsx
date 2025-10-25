@@ -1,9 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { Link } from "react-router";
-import { Helmet } from "react-helmet-async";
 
 const PlayAndWin = () => {
   const axiosSecure = useAxiosSecure();

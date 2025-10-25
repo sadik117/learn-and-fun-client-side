@@ -8,7 +8,6 @@ import registerAnimation from "../assets/registration.json";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../Authentication/AuthProvider";
 import useAxiosSecure from "../hooks/useAxiosSecure";
-import { Helmet } from "react-helmet-async";
 
 // (reverted) no public axios usage
 

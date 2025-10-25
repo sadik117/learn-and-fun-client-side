@@ -9,7 +9,6 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { toast } from "react-toastify";
 import { Link } from "react-router";
 import useAxios from "../../hooks/useAxios";
-import { Helmet } from "react-helmet-async";
 
 export default function MyProfile() {
   const axiosSecure = useAxiosSecure();

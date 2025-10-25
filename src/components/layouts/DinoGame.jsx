@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
 
 export default function DinoGame() {
   const canvasRef = useRef(null);

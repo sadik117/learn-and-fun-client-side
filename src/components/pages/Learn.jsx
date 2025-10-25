@@ -4,7 +4,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { Helmet } from "react-helmet-async";
 
 const getThumb = (ytId) => `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
 

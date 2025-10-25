@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { FiUpload } from "react-icons/fi";
 import { toast } from "react-toastify";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { Helmet } from "react-helmet-async";
 
 const PaymentPage = () => {
   const axiosSecure = useAxiosSecure();

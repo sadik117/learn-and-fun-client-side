@@ -4,7 +4,6 @@ import Lottie from "lottie-react";
 import { motion } from "framer-motion";
 import animationData from "../../assets/error-animation.json";
 import { Link } from "react-router";
-import { Helmet } from "react-helmet-async";
 
 const ErrorPage = () => {
   return (
