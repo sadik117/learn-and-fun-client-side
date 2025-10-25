@@ -42,10 +42,6 @@ export default function WithdrawPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 text-white flex items-center justify-center px-4">
 
-      <Helmet>
-        <title>Withdraw || Learn and Earned</title>
-      </Helmet>
-
       <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md shadow-lg">
         <h1 className="text-2xl font-bold mb-6 text-center">
           Withdraw Balance

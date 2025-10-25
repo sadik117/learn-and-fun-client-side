@@ -39,10 +39,6 @@ const FaqPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8 text-gray-800">
 
-      <Helmet>
-        <title>QnA || Learn and Earned</title>
-      </Helmet>
-
       {/* Page Header */}
       <div className="max-w-4xl mx-auto text-center mb-16">
         <div className="inline-block p-3 bg-purple-100 rounded-full mb-4">

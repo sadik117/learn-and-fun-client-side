@@ -45,10 +45,6 @@ export default function Login() {
   return (
     <div className="min-h-screen py-20 mx-2 md:mx-10 my-5 md:my-10 bg-gradient-to-br from-[#0a0ac7] to-[#aa24b8] flex items-center justify-center px-4">
 
-     <Helmet>
-        <title>Login || Learn and Earned</title>
-      </Helmet>
-
       <motion.div
         className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-4xl border border-white/20 flex flex-col md:flex-row gap-6 items-center"
         initial={{ y: 100, opacity: 0 }}

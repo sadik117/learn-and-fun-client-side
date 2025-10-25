@@ -14,9 +14,6 @@ const ErrorPage = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <Helmet>
-        <title>Error Page || Learn and Earned</title>
-      </Helmet>
 
       <div className="max-w-md w-full">
         <Lottie animationData={animationData} loop={true} />

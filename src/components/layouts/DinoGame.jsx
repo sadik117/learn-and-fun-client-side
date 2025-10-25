@@ -497,10 +497,6 @@ export default function DinoGame() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-400 to-blue-600 select-none p-4">
-      
-      <Helmet>
-        <title>Dino Run Game || Learn and Earned</title>
-      </Helmet>
 
       <h1 className="text-5xl font-bold mb-2 text-white drop-shadow-lg">
         🦖 DINO RUNNER

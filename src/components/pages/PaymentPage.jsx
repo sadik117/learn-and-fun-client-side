@@ -90,10 +90,6 @@ const PaymentPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white flex items-center justify-center px-4 py-10">
 
-      <Helmet>
-        <title>Payment || Learn and Earned</title>
-      </Helmet>
-
       <div className="w-full max-w-3xl bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-center">

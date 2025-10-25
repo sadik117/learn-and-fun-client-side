@@ -99,10 +99,6 @@ export default function MyProfile() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 text-white py-4 px-4 sm:px-6 lg:px-8">
 
-      <Helmet>
-        <title>My Profile || Learn and Earned</title>
-      </Helmet>
-
       {/* Profile Card */}
       <div className="bg-gray-700 p-6 my-5 rounded-2xl shadow-lg flex flex-col items-center">
         {avatar && (
