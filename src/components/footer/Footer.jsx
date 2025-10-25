@@ -16,6 +16,7 @@ import {
 
 const links = {
   platform: [
+    { label: "Q&A", to: "/questionNanswers" },
     { label: "Learn", to: "/learn" },
     { label: "Lottery", to: "/playNwin" },
     { label: "Withdraw", to: "/myprofile" },

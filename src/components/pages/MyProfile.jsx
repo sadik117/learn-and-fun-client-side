@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState, useContext } from "react";
 import Loading from "../layouts/Loading";
 import { AuthContext } from "../../Authentication/AuthProvider";
@@ -8,6 +9,7 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { toast } from "react-toastify";
 import { Link } from "react-router";
 import useAxios from "../../hooks/useAxios";
+import { Helmet } from "react-helmet-async";
 
 export default function MyProfile() {
   const axiosSecure = useAxiosSecure();
@@ -96,6 +98,11 @@ export default function MyProfile() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 text-white py-4 px-4 sm:px-6 lg:px-8">
+
+      <Helmet>
+        <title>My Profile || Learn and Earned</title>
+      </Helmet>
+
       {/* Profile Card */}
       <div className="bg-gray-700 p-6 my-5 rounded-2xl shadow-lg flex flex-col items-center">
         {avatar && (

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { Link } from "react-router";
+import { Helmet } from "react-helmet-async";
 
 const PlayAndWin = () => {
   const axiosSecure = useAxiosSecure();
@@ -80,7 +81,9 @@ const PlayAndWin = () => {
       clearInterval(spinInterval);
       setSpinning(false);
       setLoading(false);
-      setMessage("Error: " + (error?.response?.data?.message || "Failed to play"));
+      setMessage(
+        "Error: " + (error?.response?.data?.message || "Failed to play")
+      );
       setIsLoss(true);
     }
   };
@@ -94,6 +97,11 @@ const PlayAndWin = () => {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 p-6 space-y-12">
+
+      <Helmet>
+        <title>Play and Win || Learn and Earned</title>
+      </Helmet>
+
       {/* 🎰 Lottery Section */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}

@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { Helmet } from "react-helmet-async";
 
 const getThumb = (ytId) => `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
 
@@ -90,6 +91,11 @@ export default function Learn() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 text-white">
+
+      <Helmet>
+        <title>Learn Now || Learn and Earned</title>
+      </Helmet>
+
       <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl md:text-4xl font-extrabold">Learn & Grow 📚</h1>
         <p className="text-gray-300 mt-2">

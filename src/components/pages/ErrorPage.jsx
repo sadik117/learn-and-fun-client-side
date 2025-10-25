@@ -4,7 +4,7 @@ import Lottie from "lottie-react";
 import { motion } from "framer-motion";
 import animationData from "../../assets/error-animation.json";
 import { Link } from "react-router";
-
+import { Helmet } from "react-helmet-async";
 
 const ErrorPage = () => {
   return (
@@ -14,8 +14,11 @@ const ErrorPage = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <div className="max-w-md w-full">
+      <Helmet>
+        <title>Error Page || Learn and Earned</title>
+      </Helmet>
 
+      <div className="max-w-md w-full">
         <Lottie animationData={animationData} loop={true} />
         <h1 className="text-3xl font-bold text-gray-800 mt-2">
           Page Not Found

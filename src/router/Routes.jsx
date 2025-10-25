@@ -20,6 +20,7 @@ import WithdrawRequests from "../Admin/WithdrawalRequests";
 import AddCourse from "../Admin/AddCourse";
 import MemberDetails from "../components/pages/MemberDetails";
 import DinoGame from "../components/layouts/DinoGame";
+import FaqPage from "../components/pages/FaqPage";
 
 
 export const router = createBrowserRouter([
@@ -154,6 +155,10 @@ export const router = createBrowserRouter([
       {
         path:"/member-details/:email",
         Component: MemberDetails
+      },
+      {
+        path:"questionNanswers",
+        Component: FaqPage
       },
     ],
   },

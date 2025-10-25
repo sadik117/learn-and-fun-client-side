@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { Helmet } from "react-helmet-async";
 
 export default function WithdrawPage() {
   const axiosSecure = useAxiosSecure();
@@ -21,10 +22,10 @@ export default function WithdrawPage() {
     }
 
     try {
-      const res = await axiosSecure.post("/withdraw", { 
+      const res = await axiosSecure.post("/withdraw", {
         amount: Number(amount),
         phone,
-        method
+        method,
       });
       setMessage(res.data.message || "Withdraw successful");
       setAmount("");
@@ -40,8 +41,15 @@ export default function WithdrawPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 text-white flex items-center justify-center px-4">
+
+      <Helmet>
+        <title>Withdraw || Learn and Earned</title>
+      </Helmet>
+
       <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md shadow-lg">
-        <h1 className="text-2xl font-bold mb-6 text-center">Withdraw Balance</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          Withdraw Balance
+        </h1>
 
         <form onSubmit={handleWithdraw} className="space-y-4">
           {/* Amount Input */}
