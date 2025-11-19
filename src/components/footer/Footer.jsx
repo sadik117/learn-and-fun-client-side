@@ -18,7 +18,7 @@ const links = {
   platform: [
     { label: "Q&A", to: "/questionNanswers" },
     { label: "Learn", to: "/learn" },
-    { label: "Lottery", to: "/playNwin" },
+    { label: "Lottery", to: "/playgames" },
     { label: "Withdraw", to: "/myprofile" },
   ], 
 };

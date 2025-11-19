@@ -7,8 +7,8 @@ import { Link } from "react-router";
 
 const PlayAndWin = () => {
   const axiosSecure = useAxiosSecure();
-  const [balance, setBalance] = useState(0);
   const [freePlays, setFreePlays] = useState(0);
+  const [referralToken, setReferralToken] = useState("");   // ✅ NEW
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [spinning, setSpinning] = useState(false);
@@ -22,8 +22,8 @@ const PlayAndWin = () => {
   const fetchUser = async () => {
     try {
       const res = await axiosSecure.get("/my-profile");
-      setBalance(res.data?.balance ?? 0);
       setFreePlays(res.data?.freePlaysLeft ?? 0);
+      setReferralToken(res.data?.referralToken || "N/A"); // ✅ NEW
     } catch (error) {
       console.error("Failed to fetch profile:", error?.response?.data || error);
     }
@@ -40,6 +40,8 @@ const PlayAndWin = () => {
   ];
 
   const handlePlay = async () => {
+    if (spinning || loading || freePlays === 0) return;
+
     setLoading(true);
     setMessage("");
     setIsWin(false);
@@ -50,42 +52,41 @@ const PlayAndWin = () => {
       setSlots(randomSlots());
     }, 120);
 
+    let apiResponse = null;
+
     try {
-      const res = await axiosSecure.post("/lottery/play");
-
-      setTimeout(() => {
-        clearInterval(spinInterval);
-        setSpinning(false);
-        setLoading(false);
-
-        if (res.data?.success) {
-          const finalSlots = res.data.win
-            ? ["💎", "💎", "💎"]
-            : res.data.slots || randomSlots();
-          setSlots(finalSlots);
-
-          setBalance(res.data.balance ?? 0);
-          setFreePlays(res.data.freePlaysLeft ?? 0);
-          setMessage(res.data.message || "");
-
-          if (res.data.win) setIsWin(true);
-          else setIsLoss(true);
-
-          fetchUser();
-        } else {
-          setMessage(res.data?.message || "Something went wrong");
-          setIsLoss(true);
-        }
-      }, 3000);
+      const res = await axiosSecure.post("/lottery/play-free");
+      apiResponse = res.data;
     } catch (error) {
+      apiResponse = {
+        success: false,
+        message: error?.response?.data?.message || "Failed to play",
+      };
+    }
+
+    setTimeout(() => {
       clearInterval(spinInterval);
       setSpinning(false);
       setLoading(false);
-      setMessage(
-        "Error: " + (error?.response?.data?.message || "Failed to play")
-      );
-      setIsLoss(true);
-    }
+
+      if (apiResponse.success) {
+        const finalSlots = apiResponse.win
+          ? ["💎", "💎", "💎"]
+          : apiResponse.slots || randomSlots();
+
+        setSlots(finalSlots);
+        setFreePlays(apiResponse.freePlaysLeft ?? 0);
+        setMessage(apiResponse.message || "");
+
+        setIsWin(apiResponse.win);
+        setIsLoss(!apiResponse.win);
+      } else {
+        setMessage(apiResponse.message || "Something went wrong");
+        setIsLoss(true);
+      }
+
+      fetchUser();
+    }, 3000);
   };
 
   const resultGlow =
@@ -98,24 +99,25 @@ const PlayAndWin = () => {
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 p-6 space-y-12">
 
-      {/* 🎰 Lottery Section */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className={`max-w-md w-full p-8 rounded-3xl bg-white text-center space-y-6 shadow-2xl transition-all duration-300 ${resultGlow}`}
       >
-        <h1 className="text-3xl font-extrabold text-purple-700">🎰 Lottery</h1>
+        <h1 className="text-3xl font-extrabold text-purple-700">🎰 Free Lottery</h1>
 
-        {/* Balance & Free Plays */}
-        <div className="grid grid-cols-2 gap-4 text-sm font-medium">
-          <div className="bg-blue-50 p-3 rounded-xl shadow-inner">
-            <p className="text-gray-500">Balance</p>
-            <p className="text-blue-600 font-bold text-lg">{balance}৳</p>
-          </div>
-          <div className="bg-green-50 p-3 rounded-xl shadow-inner">
-            <p className="text-gray-500">Free Plays</p>
-            <p className="text-green-600 font-bold text-lg">{freePlays}</p>
-          </div>
+        {/* Free Plays */}
+        <div className="bg-green-50 p-4 rounded-xl shadow-inner text-center">
+          <p className="text-gray-500">Free Plays Available</p>
+          <p className="text-green-600 font-bold text-2xl">{freePlays}</p>
+        </div>
+
+        {/* Referral Token (NEW UI) */}
+        <div className="bg-purple-50 p-4 rounded-xl shadow-inner text-center">
+          <p className="text-gray-500">Referral Token</p>
+          <p className="text-purple-700 font-bold text-xl tracking-wide">
+            {referralToken}
+          </p>
         </div>
 
         {/* Slots */}
@@ -134,46 +136,40 @@ const PlayAndWin = () => {
                 repeat: spinning ? Infinity : 0,
                 duration: spinning ? 0.3 : 0.5,
               }}
-              className={`w-20 h-20 flex items-center justify-center rounded-xl bg-gray-100 shadow-lg
-                ${!spinning && isWin ? "ring-4 ring-green-400" : ""}
-                ${!spinning && isLoss ? "ring-2 ring-red-200" : ""}
-              `}
+              className={`w-20 h-20 flex items-center justify-center rounded-xl bg-gray-100 shadow-lg 
+                ${!spinning && isWin ? "ring-4 ring-green-400" : ""} 
+                ${!spinning && isLoss ? "ring-2 ring-red-200" : ""}`}
             >
               {item}
             </motion.div>
           ))}
         </div>
 
-        {/* CTA */}
-        <motion.div whileTap={{ scale: 0.97 }}>
+        <motion.div whileTap={{ scale: freePlays > 0 ? 0.97 : 1 }}>
           <button
-            className={`w-full py-3 text-lg font-semibold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors
+            className={`w-full py-3 text-lg font-semibold rounded-xl shadow-lg transition-colors
               ${
                 freePlays > 0
                   ? "bg-green-600 hover:bg-green-700 text-white"
-                  : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
-              }
-            `}
+                  : "bg-gray-400 text-gray-200 cursor-not-allowed"
+              }`}
             onClick={handlePlay}
-            disabled={loading || spinning}
+            disabled={freePlays === 0 || loading || spinning}
           >
-            {loading
-              ? "Playing..."
-              : freePlays > 0
-              ? "Play Free (0৳)"
-              : "Play (50৳)"}
+            {freePlays > 0
+              ? loading
+                ? "Playing..."
+                : "Play Free"
+              : "Locked (No Free Plays)"}
           </button>
         </motion.div>
 
-        {/* Result Message */}
         {message && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className={`p-4 rounded-xl font-semibold shadow-md ${
-              isWin
-                ? "bg-green-100 text-green-700"
-                : "bg-yellow-100 text-yellow-700"
+              isWin ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
             }`}
           >
             {message}
@@ -181,7 +177,7 @@ const PlayAndWin = () => {
         )}
       </motion.div>
 
-      {/* 🦖 Dino Game Section */}
+      {/* Dino Game Section */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
