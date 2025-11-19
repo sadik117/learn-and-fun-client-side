@@ -8,7 +8,7 @@ import { Link } from "react-router";
 const PlayAndWin = () => {
   const axiosSecure = useAxiosSecure();
   const [freePlays, setFreePlays] = useState(0);
-  const [referralToken, setReferralToken] = useState("");   // ✅ NEW
+  const [tokens, setTokens] = useState(0);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [spinning, setSpinning] = useState(false);
@@ -23,15 +23,12 @@ const PlayAndWin = () => {
     try {
       const res = await axiosSecure.get("/my-profile");
       setFreePlays(res.data?.freePlaysLeft ?? 0);
-      setReferralToken(res.data?.referralToken || "N/A"); // ✅ NEW
+      setReferralToken(res.data?.referralToken || "N/A");
+      setTokens(res.data?.tokens ?? 0); // 👈 NEW
     } catch (error) {
       console.error("Failed to fetch profile:", error?.response?.data || error);
     }
   };
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
 
   const randomSlots = () => [
     slotItems[Math.floor(Math.random() * slotItems.length)],
@@ -98,13 +95,14 @@ const PlayAndWin = () => {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 p-6 space-y-12">
-
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className={`max-w-md w-full p-8 rounded-3xl bg-white text-center space-y-6 shadow-2xl transition-all duration-300 ${resultGlow}`}
       >
-        <h1 className="text-3xl font-extrabold text-purple-700">🎰 Free Lottery</h1>
+        <h1 className="text-3xl font-extrabold text-purple-700">
+          🎰 Free Lottery
+        </h1>
 
         {/* Free Plays */}
         <div className="bg-green-50 p-4 rounded-xl shadow-inner text-center">
@@ -112,12 +110,10 @@ const PlayAndWin = () => {
           <p className="text-green-600 font-bold text-2xl">{freePlays}</p>
         </div>
 
-        {/* Referral Token (NEW UI) */}
-        <div className="bg-purple-50 p-4 rounded-xl shadow-inner text-center">
-          <p className="text-gray-500">Referral Token</p>
-          <p className="text-purple-700 font-bold text-xl tracking-wide">
-            {referralToken}
-          </p>
+        {/* Tokens Display */}
+        <div className="bg-yellow-50 p-4 rounded-xl shadow-inner text-center">
+          <p className="text-gray-600">Available Tokens</p>
+          <p className="text-yellow-600 font-bold text-2xl">{tokens}</p>
         </div>
 
         {/* Slots */}
@@ -169,7 +165,9 @@ const PlayAndWin = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className={`p-4 rounded-xl font-semibold shadow-md ${
-              isWin ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+              isWin
+                ? "bg-green-100 text-green-700"
+                : "bg-yellow-100 text-yellow-700"
             }`}
           >
             {message}
