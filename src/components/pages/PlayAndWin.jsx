@@ -23,11 +23,16 @@ const PlayAndWin = () => {
     try {
       const res = await axiosSecure.get("/my-profile");
       setFreePlays(res.data?.freePlaysLeft ?? 0);
-      setTokens(res.data?.tokens ?? 0); // 
+      setTokens(res.data?.tokens ?? 0);
     } catch (error) {
       console.error("Failed to fetch profile:", error?.response?.data || error);
     }
   };
+
+  // call fetchUser on component mount
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   const randomSlots = () => [
     slotItems[Math.floor(Math.random() * slotItems.length)],
