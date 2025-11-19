@@ -23,8 +23,7 @@ const PlayAndWin = () => {
     try {
       const res = await axiosSecure.get("/my-profile");
       setFreePlays(res.data?.freePlaysLeft ?? 0);
-      setReferralToken(res.data?.referralToken || "N/A");
-      setTokens(res.data?.tokens ?? 0); // 👈 NEW
+      setTokens(res.data?.tokens ?? 0); // 
     } catch (error) {
       console.error("Failed to fetch profile:", error?.response?.data || error);
     }
