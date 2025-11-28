@@ -1,192 +1,105 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { Link } from "react-router";
-import { AuthContext } from "../../Authentication/AuthProvider";
+import DinoGame from "../DinoGame"; 
 
-const PlayAndWin = () => {
+export default function PlayAndWin({ user }) {
   const axiosSecure = useAxiosSecure();
-  const { user } = useContext(AuthContext);
 
-  const [freePlays, setFreePlays] = useState(3); // default max 3
-  // eslint-disable-next-line no-unused-vars
-  const [tokens, setTokens] = useState(0);
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [spinning, setSpinning] = useState(false);
-  const [slots, setSlots] = useState(["❓", "❓", "❓"]);
-  const [isWin, setIsWin] = useState(false);
-  const [isLoss, setIsLoss] = useState(false);
+  // Lottery free play
+  const [freePlaysLeft, setFreePlaysLeft] = useState(3);
+  const [lotteryResult, setLotteryResult] = useState(null);
 
-  const slotItems = ["🍒", "🍋", "🍇", "🍊", "7️⃣", "⭐", "💎"];
+  // Dino game
+  const [dailyDinoPlaysLeft, setDailyDinoPlaysLeft] = useState(3);
 
-  // Fetch user profile
-  const fetchUser = async () => {
-    try {
-      const res = await axiosSecure.get("/my-profile");
-      setFreePlays(res.data?.freePlaysLeft ?? 3);
-      setTokens(res.data?.tokens ?? 0);
-    } catch (error) {
-      console.error("Failed to fetch profile:", error?.response?.data || error);
-    }
-  };
-
+  // Fetch daily limits
   useEffect(() => {
-    fetchUser();
-  }, []);
+    if (!user) return;
 
-  // Automatic daily reset at midnight
-  useEffect(() => {
-    const now = new Date();
-    const midnight = new Date();
-    midnight.setHours(24, 0, 0, 0); // next midnight
-    const msUntilMidnight = midnight.getTime() - now.getTime();
+    const fetchLimits = async () => {
+      try {
+        const res = await axiosSecure.get(`/user/limits/${user.email}`);
+        if (res.data.success) {
+          setFreePlaysLeft(res.data.freePlaysLeft);
+          setDailyDinoPlaysLeft(res.data.dailyDinoPlaysLeft);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-    const timer = setTimeout(() => {
-      setFreePlays(3); // reset free plays
-      setMessage("Daily free plays reset!");
-    }, msUntilMidnight);
+    fetchLimits();
+  }, [user]);
 
-    return () => clearTimeout(timer);
-  }, [freePlays]); // runs once per day
-
-  const randomSlots = () => [
-    slotItems[Math.floor(Math.random() * slotItems.length)],
-    slotItems[Math.floor(Math.random() * slotItems.length)],
-    slotItems[Math.floor(Math.random() * slotItems.length)],
-  ];
-
-  const handlePlay = async () => {
-    if (spinning || loading || freePlays === 0) return;
-    if (!user?.email) return setMessage("User email not found");
-
-    setLoading(true);
-    setMessage("");
-    setIsWin(false);
-    setIsLoss(false);
-    setSpinning(true);
-
-    const spinInterval = setInterval(() => {
-      setSlots(randomSlots());
-    }, 120);
-
-    let apiResponse = null;
+  // Play lottery free
+  const playFree = async () => {
+    if (freePlaysLeft <= 0) return alert("Daily free play limit reached!");
 
     try {
       const res = await axiosSecure.post("/lottery/play-free", {
         email: user.email,
       });
-      apiResponse = res.data;
-    } catch (error) {
-      apiResponse = {
-        success: false,
-        message: error?.response?.data?.message || "Failed to play",
-        freePlaysLeft: freePlays,
-      };
-    }
-
-    setTimeout(() => {
-      clearInterval(spinInterval);
-      setSpinning(false);
-      setLoading(false);
-
-      if (apiResponse.success) {
-        const finalSlots = apiResponse.win
-          ? ["💎", "💎", "💎"]
-          : apiResponse.slots || randomSlots();
-
-        setSlots(finalSlots);
-        setFreePlays(apiResponse.freePlaysLeft ?? 0);
-        setMessage(apiResponse.message || "");
-
-        setIsWin(apiResponse.win);
-        setIsLoss(!apiResponse.win);
+      if (res.data.success) {
+        setFreePlaysLeft(freePlaysLeft - 1);
+        setLotteryResult(res.data);
+        alert(res.data.message);
       } else {
-        if (apiResponse.message.includes("Daily free play limit")) {
-          setFreePlays(0);
-          setMessage("Daily free play limit reached. Try again tomorrow.");
-        } else {
-          setMessage(apiResponse.message || "Something went wrong");
-        }
-        setIsLoss(true);
+        alert(res.data.message);
       }
-
-      fetchUser();
-    }, 3000);
+    } catch (err) {
+      console.error(err);
+      alert("Error playing free lottery");
+    }
   };
 
-  const resultGlow =
-    !spinning && (isWin || isLoss)
-      ? isWin
-        ? "ring-4 ring-green-400 shadow-[0_0_40px_rgba(34,197,94,0.45)]"
-        : "ring-4 ring-red-300 shadow-[0_0_40px_rgba(239,68,68,0.25)]"
-      : "";
+  // Submit Dino score
+  const submitDinoScore = async (score) => {
+    if (dailyDinoPlaysLeft <= 0) return alert("Daily Dino game limit reached!");
+
+    try {
+      const res = await axiosSecure.post("/dinogame/play", {
+        email: user.email,
+        score,
+      });
+      if (res.data.success) {
+        setDailyDinoPlaysLeft(3 - res.data.dailyPlaysUsed);
+        alert(res.data.message + ` Your new balance: ${res.data.newBalance} Taka`);
+      } else {
+        alert(res.data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to submit Dino score");
+    }
+  };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 p-6 space-y-12">
+    <div className="p-6 flex flex-col items-center gap-10">
+
       {/* Lottery Section */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className={`max-w-md w-full p-8 rounded-3xl bg-white text-center space-y-6 shadow-2xl transition-all duration-300 ${resultGlow}`}
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden text-center p-6"
       >
-        <h1 className="text-3xl font-extrabold text-purple-700">🎰 Free Lottery</h1>
-
-        {/* Free Plays */}
-        {/* <div className="bg-green-50 p-4 rounded-xl shadow-inner text-center">
-          <p className="text-gray-500">Free Plays Available</p>
-          <p className="text-green-600 font-bold text-2xl">{freePlays}</p>
-        </div> */}
-        <div className="bg-green-50 p-4 rounded-xl shadow-inner text-center">
-          <p className="text-gray-500">Tokens</p>
-          <p className="text-green-600 font-bold text-2xl">{tokens}</p>
-        </div>
-
-        {/* Slots */}
-        <div className="flex justify-center space-x-4 text-5xl font-bold my-6">
-          {slots.map((item, i) => (
-            <motion.div
-              key={i}
-              animate={
-                spinning
-                  ? { y: [0, -20, 0] }
-                  : isWin
-                  ? { scale: [1, 1.06, 1] }
-                  : {}
-              }
-              transition={{
-                repeat: spinning ? Infinity : 0,
-                duration: spinning ? 0.3 : 0.5,
-              }}
-              className={`w-20 h-20 flex items-center justify-center rounded-xl bg-gray-100 shadow-lg 
-                ${!spinning && isWin ? "ring-4 ring-green-400" : ""} 
-                ${!spinning && isLoss ? "ring-2 ring-red-200" : ""}`}
-            >
-              {item}
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.div whileTap={{ scale: freePlays > 0 ? 0.97 : 1 }}>
-          <button
-            className={`w-full py-3 text-lg font-semibold rounded-xl shadow-lg transition-colors
-              ${freePlays > 0 ? "bg-green-600 hover:bg-green-700 text-white" : "bg-gray-400 text-gray-200 cursor-not-allowed"}`}
-            onClick={handlePlay}
-            disabled={freePlays === 0}
-          >
-            {freePlays > 0 ? (loading ? "Playing..." : "Play Free") : "Locked (No Free Plays)"}
-          </button>
-        </motion.div>
-
-        {message && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`p-4 rounded-xl font-semibold shadow-md ${isWin ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}
-          >
-            {message}
-          </motion.div>
+        <h2 className="text-2xl font-bold mb-4">🎰 Lottery Free Play</h2>
+        <p className="mb-4">Free plays left today: {freePlaysLeft}</p>
+        <button
+          onClick={playFree}
+          disabled={freePlaysLeft <= 0}
+          className={`py-3 px-6 rounded-xl text-white font-bold text-lg shadow-lg transition 
+            ${freePlaysLeft > 0 ? "bg-green-500 hover:bg-green-600" : "bg-gray-400 cursor-not-allowed"}`}
+        >
+          Play Free
+        </button>
+        {lotteryResult && (
+          <div className="mt-4">
+            <p>Slots: {lotteryResult.slots.join(" ")}</p>
+            <p>{lotteryResult.message}</p>
+          </div>
         )}
       </motion.div>
 
@@ -194,28 +107,19 @@ const PlayAndWin = () => {
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden text-center"
+        className="max-w-3xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden p-6"
       >
-        <img
-          src="https://i.ibb.co/8DjJygQK/google-dinosaur-game.jpg"
-          alt="Play Dino Game"
-          className="w-full h-56 object-cover"
-        />
-        <div className="p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-3">🦖 Play Dino Game</h2>
-          <p className="text-gray-500 text-sm mb-4">
-            Jump over obstacles and beat your high score — no money required!
+        <h2 className="text-2xl font-bold mb-4 text-center">🦖 Dino Game</h2>
+        <p className="text-center mb-4">Daily plays left: {dailyDinoPlaysLeft}</p>
+        {dailyDinoPlaysLeft > 0 ? (
+          <DinoGame submitScore={submitDinoScore} />
+        ) : (
+          <p className="text-red-500 text-center font-bold">
+            You have reached the daily Dino game limit.
           </p>
-          <Link
-            to="/dinogame"
-            className="block w-full py-3 text-lg font-semibold rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg transition"
-          >
-            Play Now
-          </Link>
-        </div>
+        )}
       </motion.div>
+
     </div>
   );
-};
-
-export default PlayAndWin;
+}
