@@ -173,7 +173,7 @@ const PlayAndWin = () => {
             className={`w-full py-3 text-lg font-semibold rounded-xl shadow-lg transition-colors
               ${freePlays > 0 ? "bg-green-600 hover:bg-green-700 text-white" : "bg-gray-400 text-gray-200 cursor-not-allowed"}`}
             onClick={handlePlay}
-            disabled={freePlays === 0 || loading || spinning}
+            disabled={freePlays === 0}
           >
             {freePlays > 0 ? (loading ? "Playing..." : "Play Free") : "Locked (No Free Plays)"}
           </button>
