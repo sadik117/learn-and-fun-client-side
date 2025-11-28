@@ -1,12 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { Link } from "react-router";
+import { AuthContext } from "../../Authentication/AuthProvider"; // import context to get user email
 
 const PlayAndWin = () => {
   const axiosSecure = useAxiosSecure();
+  const { user } = useContext(AuthContext); // get logged-in user
+
   const [freePlays, setFreePlays] = useState(0);
   const [tokens, setTokens] = useState(0);
   const [message, setMessage] = useState("");
@@ -29,7 +32,6 @@ const PlayAndWin = () => {
     }
   };
 
-  // call fetchUser on component mount
   useEffect(() => {
     fetchUser();
   }, []);
@@ -42,6 +44,7 @@ const PlayAndWin = () => {
 
   const handlePlay = async () => {
     if (spinning || loading || freePlays === 0) return;
+    if (!user?.email) return setMessage("User email not found");
 
     setLoading(true);
     setMessage("");
@@ -56,7 +59,10 @@ const PlayAndWin = () => {
     let apiResponse = null;
 
     try {
-      const res = await axiosSecure.post("/lottery/play-free");
+      // ✅ Send email in request body
+      const res = await axiosSecure.post("/lottery/play-free", {
+        email: user.email,
+      });
       apiResponse = res.data;
     } catch (error) {
       apiResponse = {
@@ -177,33 +183,6 @@ const PlayAndWin = () => {
             {message}
           </motion.div>
         )}
-      </motion.div>
-
-      {/* Dino Game Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden text-center"
-      >
-        <img
-          src="https://i.ibb.co.com/8DjJygQK/google-dinosaur-game.jpg"
-          alt="Play Dino Game"
-          className="w-full h-56 object-cover"
-        />
-        <div className="p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-3">
-            🦖 Play Dino Game
-          </h2>
-          <p className="text-gray-500 text-sm mb-4">
-            Jump over obstacles and beat your high score — no money required!
-          </p>
-          <Link
-            to="/dinogame"
-            className="block w-full py-3 text-lg font-semibold rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg transition"
-          >
-            Play Now
-          </Link>
-        </div>
       </motion.div>
     </div>
   );

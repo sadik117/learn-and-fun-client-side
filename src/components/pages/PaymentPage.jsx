@@ -97,7 +97,7 @@ const PaymentPage = () => {
             Please make your payment to the following account:
           </p>
           <p className="text-lg font-semibold text-yellow-300 mt-2">
-            Send Money 800৳ to this Nagad/Bkash Number:{" "}
+            Send Money 400৳ to this Nagad/Bkash Number:{" "}
             <span className="text-white">01704330646</span>
           </p>
         </div>
