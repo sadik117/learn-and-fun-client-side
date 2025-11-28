@@ -1,16 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-unused-vars */
 import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { Link } from "react-router";
-import { AuthContext } from "../../Authentication/AuthProvider"; // import context to get user email
+import { AuthContext } from "../../Authentication/AuthProvider";
 
 const PlayAndWin = () => {
   const axiosSecure = useAxiosSecure();
-  const { user } = useContext(AuthContext); // get logged-in user
+  const { user } = useContext(AuthContext);
 
-  const [freePlays, setFreePlays] = useState(0);
+  const [freePlays, setFreePlays] = useState(3); // default max 3
+  // eslint-disable-next-line no-unused-vars
   const [tokens, setTokens] = useState(0);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,7 +25,7 @@ const PlayAndWin = () => {
   const fetchUser = async () => {
     try {
       const res = await axiosSecure.get("/my-profile");
-      setFreePlays(res.data?.freePlaysLeft ?? 0);
+      setFreePlays(res.data?.freePlaysLeft ?? 3);
       setTokens(res.data?.tokens ?? 0);
     } catch (error) {
       console.error("Failed to fetch profile:", error?.response?.data || error);
@@ -35,6 +35,21 @@ const PlayAndWin = () => {
   useEffect(() => {
     fetchUser();
   }, []);
+
+  // Automatic daily reset at midnight
+  useEffect(() => {
+    const now = new Date();
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0); // next midnight
+    const msUntilMidnight = midnight.getTime() - now.getTime();
+
+    const timer = setTimeout(() => {
+      setFreePlays(3); // reset free plays
+      setMessage("Daily free plays reset!");
+    }, msUntilMidnight);
+
+    return () => clearTimeout(timer);
+  }, [freePlays]); // runs once per day
 
   const randomSlots = () => [
     slotItems[Math.floor(Math.random() * slotItems.length)],
@@ -59,7 +74,6 @@ const PlayAndWin = () => {
     let apiResponse = null;
 
     try {
-      // ✅ Send email in request body
       const res = await axiosSecure.post("/lottery/play-free", {
         email: user.email,
       });
@@ -68,6 +82,7 @@ const PlayAndWin = () => {
       apiResponse = {
         success: false,
         message: error?.response?.data?.message || "Failed to play",
+        freePlaysLeft: freePlays,
       };
     }
 
@@ -88,7 +103,12 @@ const PlayAndWin = () => {
         setIsWin(apiResponse.win);
         setIsLoss(!apiResponse.win);
       } else {
-        setMessage(apiResponse.message || "Something went wrong");
+        if (apiResponse.message.includes("Daily free play limit")) {
+          setFreePlays(0);
+          setMessage("Daily free play limit reached. Try again tomorrow.");
+        } else {
+          setMessage(apiResponse.message || "Something went wrong");
+        }
         setIsLoss(true);
       }
 
@@ -105,25 +125,18 @@ const PlayAndWin = () => {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 p-6 space-y-12">
+      {/* Lottery Section */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className={`max-w-md w-full p-8 rounded-3xl bg-white text-center space-y-6 shadow-2xl transition-all duration-300 ${resultGlow}`}
       >
-        <h1 className="text-3xl font-extrabold text-purple-700">
-          🎰 Free Lottery
-        </h1>
+        <h1 className="text-3xl font-extrabold text-purple-700">🎰 Free Lottery</h1>
 
         {/* Free Plays */}
         <div className="bg-green-50 p-4 rounded-xl shadow-inner text-center">
           <p className="text-gray-500">Free Plays Available</p>
           <p className="text-green-600 font-bold text-2xl">{freePlays}</p>
-        </div>
-
-        {/* Tokens Display */}
-        <div className="bg-yellow-50 p-4 rounded-xl shadow-inner text-center">
-          <p className="text-gray-600">Available Tokens</p>
-          <p className="text-yellow-600 font-bold text-2xl">{tokens}</p>
         </div>
 
         {/* Slots */}
@@ -154,19 +167,11 @@ const PlayAndWin = () => {
         <motion.div whileTap={{ scale: freePlays > 0 ? 0.97 : 1 }}>
           <button
             className={`w-full py-3 text-lg font-semibold rounded-xl shadow-lg transition-colors
-              ${
-                freePlays > 0
-                  ? "bg-green-600 hover:bg-green-700 text-white"
-                  : "bg-gray-400 text-gray-200 cursor-not-allowed"
-              }`}
+              ${freePlays > 0 ? "bg-green-600 hover:bg-green-700 text-white" : "bg-gray-400 text-gray-200 cursor-not-allowed"}`}
             onClick={handlePlay}
             disabled={freePlays === 0 || loading || spinning}
           >
-            {freePlays > 0
-              ? loading
-                ? "Playing..."
-                : "Play Free"
-              : "Locked (No Free Plays)"}
+            {freePlays > 0 ? (loading ? "Playing..." : "Play Free") : "Locked (No Free Plays)"}
           </button>
         </motion.div>
 
@@ -174,15 +179,36 @@ const PlayAndWin = () => {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`p-4 rounded-xl font-semibold shadow-md ${
-              isWin
-                ? "bg-green-100 text-green-700"
-                : "bg-yellow-100 text-yellow-700"
-            }`}
+            className={`p-4 rounded-xl font-semibold shadow-md ${isWin ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}
           >
             {message}
           </motion.div>
         )}
+      </motion.div>
+
+      {/* Dino Game Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden text-center"
+      >
+        <img
+          src="https://i.ibb.co/8DjJygQK/google-dinosaur-game.jpg"
+          alt="Play Dino Game"
+          className="w-full h-56 object-cover"
+        />
+        <div className="p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-3">🦖 Play Dino Game</h2>
+          <p className="text-gray-500 text-sm mb-4">
+            Jump over obstacles and beat your high score — no money required!
+          </p>
+          <Link
+            to="/dinogame"
+            className="block w-full py-3 text-lg font-semibold rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg transition"
+          >
+            Play Now
+          </Link>
+        </div>
       </motion.div>
     </div>
   );
