@@ -132,7 +132,6 @@ export default function DinoGame({ submitScore }) {
     const obstacleSprite = createObstacleSprites();
 
     // ------------------ Input ------------------
-    const keys = {};
     const handleKeyDown = (e) => {
       if (e.code === "ArrowUp" || e.code === "Space") {
         e.preventDefault();
