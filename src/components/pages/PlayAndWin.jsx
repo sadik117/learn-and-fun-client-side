@@ -2,7 +2,7 @@
 import React, { useState} from "react";
 import { motion } from "framer-motion";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import DinoGame from "../DinoGame"; 
+import DinoGame from "../layouts/DinoGame";
 
 export default function PlayAndWin({ user }) {
   const axiosSecure = useAxiosSecure();
