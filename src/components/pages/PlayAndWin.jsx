@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import { motion } from "framer-motion";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import DinoGame from "../DinoGame"; 
@@ -13,25 +13,6 @@ export default function PlayAndWin({ user }) {
 
   // Dino game
   const [dailyDinoPlaysLeft, setDailyDinoPlaysLeft] = useState(3);
-
-  // Fetch daily limits
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchLimits = async () => {
-      try {
-        const res = await axiosSecure.get(`/user/limits/${user.email}`);
-        if (res.data.success) {
-          setFreePlaysLeft(res.data.freePlaysLeft);
-          setDailyDinoPlaysLeft(res.data.dailyDinoPlaysLeft);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchLimits();
-  }, [user]);
 
   // Play lottery free
   const playFree = async () => {

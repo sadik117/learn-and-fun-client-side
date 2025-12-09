@@ -347,4 +347,4 @@ export default function DinoGame({ submitScore }) {
       </div>
     </div>
   );
-}
+}  
