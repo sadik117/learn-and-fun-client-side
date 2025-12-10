@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // src/pages/DinoGame.jsx
 import React, { useRef, useEffect, useState } from "react";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
@@ -21,7 +22,7 @@ export default function DinoGame() {
         const res = await axiosSecure.get("/my-profile");
         if (mounted) setEmail(res.data?.email || "");
       } catch (err) {
-        // ignore
+        console.log(err);
       }
     })();
     return () => (mounted = false);

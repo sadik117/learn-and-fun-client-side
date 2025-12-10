@@ -110,11 +110,6 @@ const PlayAndWin = () => {
       >
         <h1 className="text-3xl font-extrabold text-purple-700">🎰 Free Lottery</h1>
 
-        <div className="bg-green-50 p-4 rounded-xl shadow-inner text-center">
-          <p className="text-gray-500">Free Plays Available</p>
-          <p className="text-green-600 font-bold text-2xl">{freePlays}</p>
-        </div>
-
         <div className="bg-yellow-50 p-4 rounded-xl shadow-inner text-center">
           <p className="text-gray-600">Available Tokens</p>
           <p className="text-yellow-600 font-bold text-2xl">{tokens}</p>
