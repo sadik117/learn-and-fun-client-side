@@ -135,7 +135,7 @@ const PlayAndWin = () => {
             className={`w-full py-3 text-lg font-semibold rounded-xl shadow-lg transition-colors
               ${freePlays > 0 ? "bg-green-600 hover:bg-green-700 text-white" : "bg-gray-400 text-gray-200 cursor-not-allowed"}`}
             onClick={handlePlay}
-            disabled={freePlays === 0 || loading || spinning}
+            disabled={freePlays === 0}
           >
             {freePlays > 0 ? (loading ? "Playing..." : "Play Free") : "Locked (No Free Plays)"}
           </button>
@@ -149,7 +149,7 @@ const PlayAndWin = () => {
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden text-center">
-        <img src="https://via.placeholder.com/800x320?text=Dino+Game" alt="Play Dino Game" className="w-full h-56 object-cover" />
+        <img src="https://i.ibb.co.com/8DjJygQK/google-dinosaur-game.jpg" alt="Play Dino Game" className="w-full h-56 object-cover" />
         <div className="p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-3">🦖 Play Dino Game</h2>
           <p className="text-gray-500 text-sm mb-4">Jump over obstacles and beat your high score — no money required!</p>
