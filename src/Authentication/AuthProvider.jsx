@@ -10,20 +10,18 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { toast } from "react-toastify";
-import {jwtDecode} from "jwt-decode";
 
 const auth = getAuth(app);
+export const AuthContext = createContext(null);
 
-export const AuthContext = createContext();
-
-/* JWT HELPER */
+/* ================= JWT EXPIRY CHECK (NO LIB) ================= */
 const isTokenExpired = () => {
   const token = localStorage.getItem("access-token");
   if (!token) return true;
 
   try {
-    const decoded = jwtDecode(token);
-    return decoded.exp * 1000 < Date.now();
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000 < Date.now();
   } catch {
     return true;
   }
@@ -33,8 +31,7 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  /* AUTH METHODS */
-
+  /*  AUTH METHODS  */
   const createUser = (email, password) => {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
@@ -53,8 +50,7 @@ const AuthProvider = ({ children }) => {
     return updatePassword(user, newPassword);
   };
 
-  /* LOGOUT */
-
+  /*  LOGOUT  */
   const logOut = async () => {
     try {
       await signOut(auth);
@@ -66,12 +62,9 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  /* AUTH STATE LISTENER */
-
+  // AUTH STATE
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-
-      // JWT expired → force logout
       if (isTokenExpired()) {
         await signOut(auth);
         localStorage.removeItem("access-token");
@@ -86,8 +79,6 @@ const AuthProvider = ({ children }) => {
 
     return () => unsubscribe();
   }, []);
-
-  /* CONTEXT DATA */
 
   const authData = {
     user,
