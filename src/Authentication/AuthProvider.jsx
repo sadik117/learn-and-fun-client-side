@@ -10,7 +10,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { toast } from "react-toastify";
-import jwtDecode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 const auth = getAuth(app);
 
