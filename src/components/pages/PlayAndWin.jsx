@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { Link } from "react-router";
-
+import { useNavigate } from "react-router";
 
 const PlayAndWin = () => {
   const axiosSecure = useAxiosSecure();
@@ -16,6 +15,8 @@ const PlayAndWin = () => {
   const [slots, setSlots] = useState(["❓", "❓", "❓"]);
   const [isWin, setIsWin] = useState(false);
   const [isLoss, setIsLoss] = useState(false);
+
+  const navigate = useNavigate();
 
   const slotItems = ["🍒", "🍋", "🍇", "🍊", "7️⃣", "⭐", "💎"];
 
@@ -72,10 +73,15 @@ const PlayAndWin = () => {
       setLoading(false);
 
       if (apiResponse && apiResponse.success) {
-        const finalSlots = apiResponse.win ? ["💎", "💎", "💎"] : apiResponse.slots || randomSlots();
+        const finalSlots = apiResponse.win
+          ? ["💎", "💎", "💎"]
+          : apiResponse.slots || randomSlots();
         setSlots(finalSlots);
 
-        if (apiResponse.freePlaysLeft !== undefined && apiResponse.freePlaysLeft !== null) {
+        if (
+          apiResponse.freePlaysLeft !== undefined &&
+          apiResponse.freePlaysLeft !== null
+        ) {
           setFreePlays(apiResponse.freePlaysLeft);
         } else {
           // fall back to refetch
@@ -108,7 +114,9 @@ const PlayAndWin = () => {
         animate={{ opacity: 1, scale: 1 }}
         className={`max-w-md w-full p-8 rounded-3xl bg-white text-center space-y-6 shadow-2xl transition-all duration-300 ${resultGlow}`}
       >
-        <h1 className="text-3xl font-extrabold text-purple-700">🎰 Free Lottery</h1>
+        <h1 className="text-3xl font-extrabold text-purple-700">
+          🎰 Free Lottery
+        </h1>
 
         <div className="bg-yellow-50 p-4 rounded-xl shadow-inner text-center">
           <p className="text-gray-600">Available Tokens</p>
@@ -119,8 +127,17 @@ const PlayAndWin = () => {
           {slots.map((item, i) => (
             <motion.div
               key={i}
-              animate={spinning ? { y: [0, -20, 0] } : isWin ? { scale: [1, 1.06, 1] } : {}}
-              transition={{ repeat: spinning ? Infinity : 0, duration: spinning ? 0.3 : 0.5 }}
+              animate={
+                spinning
+                  ? { y: [0, -20, 0] }
+                  : isWin
+                  ? { scale: [1, 1.06, 1] }
+                  : {}
+              }
+              transition={{
+                repeat: spinning ? Infinity : 0,
+                duration: spinning ? 0.3 : 0.5,
+              }}
               className={`w-20 h-20 flex items-center justify-center rounded-xl bg-gray-100 shadow-lg 
                 ${!spinning && isWin ? "ring-4 ring-green-400" : ""} 
                 ${!spinning && isLoss ? "ring-2 ring-red-200" : ""}`}
@@ -133,30 +150,66 @@ const PlayAndWin = () => {
         <motion.div whileTap={{ scale: freePlays > 0 ? 0.97 : 1 }}>
           <button
             className={`w-full py-3 text-lg font-semibold rounded-xl shadow-lg transition-colors
-              ${freePlays > 0 ? "bg-green-600 hover:bg-green-700 text-white" : "bg-gray-400 text-gray-200 cursor-not-allowed"}`}
+              ${
+                freePlays > 0
+                  ? "bg-green-600 hover:bg-green-700 text-white"
+                  : "bg-gray-400 text-gray-200 cursor-not-allowed"
+              }`}
             onClick={handlePlay}
             disabled={freePlays === 0}
           >
-            {freePlays > 0 ? (loading ? "Playing..." : "Play Free") : "Locked (No Free Plays)"}
+            {freePlays > 0
+              ? loading
+                ? "Playing..."
+                : "Play Free"
+              : "Locked (No Free Plays)"}
           </button>
         </motion.div>
 
         {message && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className={`p-4 rounded-xl font-semibold shadow-md ${isWin ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`p-4 rounded-xl font-semibold shadow-md ${
+              isWin
+                ? "bg-green-100 text-green-700"
+                : "bg-yellow-100 text-yellow-700"
+            }`}
+          >
             {message}
           </motion.div>
         )}
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden text-center">
-        <img src="https://i.ibb.co.com/8DjJygQK/google-dinosaur-game.jpg" alt="Play Dino Game" className="w-full h-56 object-cover" />
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden text-center"
+      >
+        <img
+          src="https://i.ibb.co.com/8DjJygQK/google-dinosaur-game.jpg"
+          alt="Play Dino Game"
+          className="w-full h-56 object-cover"
+        />
         <div className="p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-3">🦖 Play Dino Game</h2>
-          <p className="text-gray-500 text-sm mb-4">Jump over obstacles and beat your high score — no money required!</p>
-          <Link to="/dinogame"
-          disabled={freePlays === 0} 
-           className="block w-full py-3 text-lg font-semibold rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg transition">
-            {freePlays > 0 ? ("Play Free") : "Locked (No Free Plays)"} </Link>
+          <h2 className="text-2xl font-bold text-gray-800 mb-3">
+            🦖 Play Dino Game
+          </h2>
+          <p className="text-gray-500 text-sm mb-4">
+            Jump over obstacles and beat your high score — no money required!
+          </p>
+          <button
+            onClick={() => freePlays > 0 && navigate("/dinogame")}
+            disabled={freePlays === 0}
+            className={`w-full py-3 text-lg font-semibold rounded-xl shadow-lg transition
+    ${
+      freePlays > 0
+        ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+        : "bg-gray-400 text-gray-200 cursor-not-allowed"
+    }`}
+          >
+            {freePlays > 0 ? "Play Free" : "Locked (No Free Plays)"}
+          </button>
         </div>
       </motion.div>
     </div>
