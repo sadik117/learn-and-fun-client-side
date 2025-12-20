@@ -14,7 +14,7 @@ import {jwtDecode} from "jwt-decode";
 
 const auth = getAuth(app);
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 /* JWT HELPER */
 const isTokenExpired = () => {
