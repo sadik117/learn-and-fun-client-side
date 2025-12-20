@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import app from "./firebase.config";
 import {
   createUserWithEmailAndPassword,
@@ -10,10 +10,11 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { toast } from "react-toastify";
-import { AuthContext } from "./AuthContext";
 import jwtDecode from "jwt-decode";
 
 const auth = getAuth(app);
+
+const AuthContext = createContext();
 
 /* JWT HELPER */
 const isTokenExpired = () => {
