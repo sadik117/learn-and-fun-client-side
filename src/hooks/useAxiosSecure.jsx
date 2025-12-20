@@ -1,47 +1,27 @@
 /* eslint-disable no-empty */
 import axios from "axios";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
-// Build base URL with optional API prefix (e.g., /api or /api/v1)
+
+// Build base URL with optional API prefix
 const buildBaseURL = () => {
-  const rawBase = import.meta.env.VITE_API_BASE_URL ||
+  const rawBase =
+    import.meta.env.VITE_API_BASE_URL ||
     "https://learn-and-earn-server-side.vercel.app";
+
   const base = rawBase.replace(/\/$/, "");
   const rawPrefix = (import.meta.env.VITE_API_PREFIX || "").trim();
   const normalizedPrefix = rawPrefix
-    ? (rawPrefix.startsWith("/") ? rawPrefix : `/${rawPrefix}`)
+    ? rawPrefix.startsWith("/") ? rawPrefix : `/${rawPrefix}`
     : "";
 
-  const finalURL = `${base}${normalizedPrefix}`.replace(/\/$/, "");
-
-  // Log once in the browser to help diagnose prod env config
-  try {
-    if (typeof window !== "undefined" && !window.__LEARN_API_BASE_LOGGED__) {
-      // eslint-disable-next-line no-console
-      console.log(
-        "[API] base:", base,
-        "prefix:", normalizedPrefix || "(none)",
-        "=>",
-        finalURL
-      );
-      if (!normalizedPrefix) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          "[API] No VITE_API_PREFIX set. Ensure backend accepts bare paths or set /api."
-        );
-      }
-      window.__LEARN_API_BASE_LOGGED__ = true;
-    }
-  } catch {}
-
-  return finalURL;
+  return `${base}${normalizedPrefix}`.replace(/\/$/, "");
 };
 
-// Create a secure Axios instance
+// Axios instance
 const axiosSecure = axios.create({
   baseURL: buildBaseURL(),
-  // Use Authorization header, not cookies
   withCredentials: false,
 });
 
@@ -49,6 +29,7 @@ const useAxiosSecure = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    /* REQUEST */
     const requestInterceptor = axiosSecure.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem("access-token");
@@ -60,18 +41,27 @@ const useAxiosSecure = () => {
       (error) => Promise.reject(error)
     );
 
-    // - Optional: handle 401 globally
+    /*  RESPONSE */
     const responseInterceptor = axiosSecure.interceptors.response.use(
       (response) => response,
-      (error) => {
-        if (error.response && error.response.status === 401) {
-          navigate("/auth/login");
+      async (error) => {
+        const status = error?.response?.status;
+
+        if (status === 401 || status === 403) {
+          //  FORCE LOGOUT
+          localStorage.removeItem("access-token");
+
+          // Prevent infinite redirect loop
+          if (!window.location.pathname.includes("/auth/login")) {
+            navigate("/auth/login", { replace: true });
+          }
         }
+
         return Promise.reject(error);
       }
     );
 
-    // - Cleanup interceptors on unmount
+    /*  CLEANUP  */
     return () => {
       axiosSecure.interceptors.request.eject(requestInterceptor);
       axiosSecure.interceptors.response.eject(responseInterceptor);

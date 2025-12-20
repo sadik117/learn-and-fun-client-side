@@ -1,22 +1,48 @@
-import React, { useContext } from 'react';
-import { Navigate, useLocation} from "react-router-dom";
-import { AuthContext } from './AuthProvider';
-import Loading from '../components/layouts/Loading';
+import React, { useContext } from "react";
+import { AuthContext } from "./AuthProvider";
+import Loading from "../components/layouts/Loading";
+import jwtDecode from "jwt-decode";
+import { Navigate, useLocation } from "react-router";
 
+const isTokenExpired = () => {
+  const token = localStorage.getItem("access-token");
+  if (!token) return true;
 
-const PrivateRoute = ({children}) => {
-    const {user, loading} = useContext(AuthContext);
-    const location = useLocation();  
+  try {
+    const decoded = jwtDecode(token);
+    return decoded.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+};
 
-    if(loading){
-        return <Loading></Loading>
-    }
-    if(user && user?.email){
-         return children;
-    }
+const PrivateRoute = ({ children }) => {
+  const { user, loading, logout } = useContext(AuthContext);
+  const location = useLocation();
 
-    return <Navigate to="/auth/login" state={{ from: location }} replace />;
-   
+  if (loading) return <Loading />;
+
+  // AUTO LOGOUT if token expired
+  if (isTokenExpired()) {
+    logout();
+    return (
+      <Navigate
+        to="/auth/login"
+        state={{ from: location }}
+        replace
+      />
+    );
+  }
+
+  if (user?.email) return children;
+
+  return (
+    <Navigate
+      to="/auth/login"
+      state={{ from: location }}
+      replace
+    />
+  );
 };
 
 export default PrivateRoute;

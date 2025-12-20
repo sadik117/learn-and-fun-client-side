@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import app from "./firebase.config";
 import {
   createUserWithEmailAndPassword,
@@ -10,23 +10,33 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { toast } from "react-toastify";
-
-export const AuthContext = createContext();
+import { AuthContext } from "./AuthContext";
+import jwtDecode from "jwt-decode";
 
 const auth = getAuth(app);
+
+/* JWT HELPER */
+const isTokenExpired = () => {
+  const token = localStorage.getItem("access-token");
+  if (!token) return true;
+
+  try {
+    const decoded = jwtDecode(token);
+    return decoded.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+};
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  /* AUTH METHODS */
+
   const createUser = (email, password) => {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
-  };
-
-  // Updated to match the Register component: accepts an object
-  const updateUserProfile = (profile) => {
-    return updateProfile(auth.currentUser, profile);
   };
 
   const signIn = (email, password) => {
@@ -34,44 +44,67 @@ const AuthProvider = ({ children }) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-
-  const logOut = () => {
-    signOut(auth)
-      .then(() => {
-        toast.success("Signout successful!");
-      })
-      .catch((error) => {
-        toast.error("Signout failed: " + error.message);
-      });
+  const updateUserProfile = (profile) => {
+    return updateProfile(auth.currentUser, profile);
   };
-
-  useEffect(() => {
-    const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-    return () => {
-      unSubscribe();
-    };
-  }, []);
 
   const forgotPass = (user, newPassword) => {
     return updatePassword(user, newPassword);
   };
 
+  /* LOGOUT */
+
+  const logOut = async () => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem("access-token");
+      setUser(null);
+      toast.success("Signout successful!");
+    } catch (error) {
+      toast.error("Signout failed: " + error.message);
+    }
+  };
+
+  /* AUTH STATE LISTENER */
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+
+      // JWT expired → force logout
+      if (isTokenExpired()) {
+        await signOut(auth);
+        localStorage.removeItem("access-token");
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      setUser(currentUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  /* CONTEXT DATA */
+
   const authData = {
     user,
     setUser,
+    loading,
+    setLoading,
     createUser,
     signIn,
     logOut,
-    loading,
-    setLoading,
     updateUserProfile,
     forgotPass,
   };
 
-  return <AuthContext.Provider value={authData}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={authData}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export default AuthProvider;
