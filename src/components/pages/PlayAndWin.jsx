@@ -153,7 +153,10 @@ const PlayAndWin = () => {
         <div className="p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-3">🦖 Play Dino Game</h2>
           <p className="text-gray-500 text-sm mb-4">Jump over obstacles and beat your high score — no money required!</p>
-          <Link to="/dinogame" className="block w-full py-3 text-lg font-semibold rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg transition">Play Now</Link>
+          <Link to="/dinogame"
+          disabled={freePlays === 0} 
+           className="block w-full py-3 text-lg font-semibold rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg transition">
+            {freePlays > 0 ? ("Play Free") : "Locked (No Free Plays)"} </Link>
         </div>
       </motion.div>
     </div>
