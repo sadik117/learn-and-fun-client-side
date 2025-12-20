@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useContext, useMemo } from "react";
 import useAxiosSecure from "./useAxiosSecure";
-import { AuthContext } from "../Authentication/AuthProvider";
+import { AuthContext } from "../Authentication/AuthContext";
+
 
 /**
  * useUserRole({ referralCode, email, enabled })
