@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState, useContext } from "react";
 import Loading from "../layouts/Loading";
-import { AuthContext } from "../../Authentication/AuthProvider";
 import { FiCopy } from "react-icons/fi";
 import { LuCrown } from "react-icons/lu";
 import { GiCash } from "react-icons/gi";
@@ -9,6 +8,7 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { toast } from "react-toastify";
 import { Link } from "react-router";
 import useAxios from "../../hooks/useAxios";
+import { AuthContext } from "../../Authentication/AuthContext";
 
 export default function MyProfile() {
   const axiosSecure = useAxiosSecure();
