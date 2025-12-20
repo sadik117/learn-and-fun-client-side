@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { AuthContext } from "./AuthProvider";
 import Loading from "../components/layouts/Loading";
 import { Navigate, useLocation } from "react-router";
+import { AuthContext } from "./AuthContext";
 
 /*  JWT EXPIRY CHECK (NO LIB)  */
 const isTokenExpired = () => {

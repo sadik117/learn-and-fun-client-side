@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import app from "./firebase.config";
 import {
   createUserWithEmailAndPassword,
@@ -10,11 +10,12 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { toast } from "react-toastify";
+import { AuthContext } from "./AuthContext";
 
 const auth = getAuth(app);
-export const AuthContext = createContext(null);
 
-/* ================= JWT EXPIRY CHECK (NO LIB) ================= */
+
+/* JWT EXPIRY CHECK (NO LIB)  */
 const isTokenExpired = () => {
   const token = localStorage.getItem("access-token");
   if (!token) return true;
