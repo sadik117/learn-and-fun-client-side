@@ -6,8 +6,8 @@ import { motion } from "framer-motion";
 import Lottie from "lottie-react";
 import registerAnimation from "../assets/registration.json";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { AuthContext } from "../Authentication/AuthProvider";
 import useAxiosSecure from "../hooks/useAxiosSecure";
+import { AuthContext } from "./AuthContext";
 
 // (reverted) no public axios usage
 
