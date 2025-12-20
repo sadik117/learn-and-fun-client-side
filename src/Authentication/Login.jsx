@@ -6,7 +6,8 @@ import Lottie from "lottie-react";
 import loginAnimation from "../assets/login.json";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAxios from "../hooks/useAxios";
-import { AuthContext } from "./AuthProvider";
+import { AuthContext } from "./AuthContext";
+
 
 export default function Login() {
   const { setUser, signIn } = useContext(AuthContext);
