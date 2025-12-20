@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 // src/pages/PlayAndWin.jsx
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -15,22 +17,28 @@ const PlayAndWin = () => {
   const [slots, setSlots] = useState(["❓", "❓", "❓"]);
   const [isWin, setIsWin] = useState(false);
   const [isLoss, setIsLoss] = useState(false);
+  const [unlockDate, setUnlockDate] = useState(null);
+  const [isUnlocked, setIsUnlocked] = useState(false);
 
   const navigate = useNavigate();
 
   const slotItems = ["🍒", "🍋", "🍇", "🍊", "7️⃣", "⭐", "💎"];
 
   // Fetch user profile
-  const fetchUser = async () => {
-    try {
-      const res = await axiosSecure.get("/my-profile");
-      setFreePlays(res.data?.freePlaysLeft ?? 0);
-      setTokens(res.data?.tokens ?? 0);
-      setEmail(res.data?.email || "");
-    } catch (error) {
-      console.error("Failed to fetch profile:", error?.response?.data || error);
-    }
-  };
+ const fetchUser = async () => {
+  const res = await axiosSecure.get("/my-profile");
+
+  setFreePlays(res.data?.freePlaysLeft ?? 0);
+  setTokens(res.data?.tokens ?? 0);
+  setEmail(res.data?.email || "");
+
+  const unlock = res.data?.unlockDate
+    ? new Date(res.data.unlockDate) > new Date()
+    : false;
+
+  setUnlockDate(res.data?.unlockDate || null);
+  setIsUnlocked(unlock);
+};
 
   useEffect(() => {
     fetchUser();
@@ -156,9 +164,9 @@ const PlayAndWin = () => {
                   : "bg-gray-400 text-gray-200 cursor-not-allowed"
               }`}
             onClick={handlePlay}
-            disabled={freePlays === 0}
+            disabled={!isUnlocked}
           >
-            {freePlays > 0
+            {isUnlocked
               ? loading
                 ? "Playing..."
                 : "Play Free"
@@ -199,7 +207,7 @@ const PlayAndWin = () => {
             Jump over obstacles and beat your high score — no money required!
           </p>
           <button
-            onClick={() => freePlays > 0 && navigate("/dinogame")}
+            onClick={() => !isUnlocked && navigate("/dinogame")}
             disabled={freePlays === 0}
             className={`w-full py-3 text-lg font-semibold rounded-xl shadow-lg transition
     ${
@@ -208,7 +216,7 @@ const PlayAndWin = () => {
         : "bg-gray-400 text-gray-200 cursor-not-allowed"
     }`}
           >
-            {freePlays > 0 ? "Play Free" : "Locked (No Free Plays)"}
+            {isUnlocked ? "Play Free" : "Locked (No Free Plays)"}
           </button>
         </div>
       </motion.div>
