@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-// src/pages/PlayAndWin.jsx
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
@@ -19,6 +18,9 @@ const PlayAndWin = () => {
   const [isLoss, setIsLoss] = useState(false);
   const [unlockDate, setUnlockDate] = useState(null);
   const [isUnlocked, setIsUnlocked] = useState(false);
+  const [remainingToday, setRemainingToday] = useState(3);
+  const [nextResetAt, setNextResetAt] = useState(null);
+  const [timeLeft, setTimeLeft] = useState("");
 
   const navigate = useNavigate();
 
@@ -27,6 +29,10 @@ const PlayAndWin = () => {
   // Fetch user profile
   const fetchUser = async () => {
     const res = await axiosSecure.get("/my-profile");
+
+    if (res.data.nextResetAt) {
+      setNextResetAt(new Date(res.data.nextResetAt));
+    }
 
     setFreePlays(res.data?.freePlaysLeft ?? 0);
     setTokens(res.data?.tokens ?? 0);
@@ -44,6 +50,35 @@ const PlayAndWin = () => {
     fetchUser();
   }, []);
 
+  // timer for next reset
+  useEffect(() => {
+    if (!nextResetAt) return;
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      const diff = nextResetAt - now;
+
+      if (diff <= 0) {
+        setTimeLeft("");
+        setRemainingToday(3); // reset UI
+        clearInterval(interval);
+        return;
+      }
+
+      const h = Math.floor(diff / (1000 * 60 * 60));
+      const m = Math.floor((diff / (1000 * 60)) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+
+      setTimeLeft(
+        `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s
+          .toString()
+          .padStart(2, "0")}`
+      );
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [nextResetAt]);
+
   const randomSlots = () => [
     slotItems[Math.floor(Math.random() * slotItems.length)],
     slotItems[Math.floor(Math.random() * slotItems.length)],
@@ -51,61 +86,40 @@ const PlayAndWin = () => {
   ];
 
   const handlePlay = async () => {
-    if (spinning || loading || freePlays <= 0) return;
+    if (spinning || loading || !isUnlocked || remainingToday <= 0) return;
 
     setLoading(true);
+    setSpinning(true);
     setMessage("");
     setIsWin(false);
     setIsLoss(false);
-    setSpinning(true);
 
     const spinInterval = setInterval(() => {
       setSlots(randomSlots());
     }, 120);
 
-    let apiResponse = null;
-
     try {
       const res = await axiosSecure.post("/lottery/play-free", { email });
-      apiResponse = res.data;
-    } catch (error) {
-      apiResponse = {
-        success: false,
-        message: error?.response?.data?.message || "Failed to play",
-      };
-    }
 
-    setTimeout(() => {
+      setTimeout(() => {
+        clearInterval(spinInterval);
+        setSpinning(false);
+        setLoading(false);
+
+        setSlots(res.data.slots);
+        setRemainingToday(res.data.remainingToday);
+        setMessage(res.data.message);
+        setIsWin(res.data.win);
+        setIsLoss(!res.data.win);
+      }, 2000);
+    } catch (err) {
       clearInterval(spinInterval);
       setSpinning(false);
       setLoading(false);
 
-      if (apiResponse && apiResponse.success) {
-        const finalSlots = apiResponse.win
-          ? ["💎", "💎", "💎"]
-          : apiResponse.slots || randomSlots();
-        setSlots(finalSlots);
-
-        if (
-          apiResponse.freePlaysLeft !== undefined &&
-          apiResponse.freePlaysLeft !== null
-        ) {
-          setFreePlays(apiResponse.freePlaysLeft);
-        } else {
-          // fall back to refetch
-          fetchUser();
-        }
-
-        setMessage(apiResponse.message || "");
-        setIsWin(Boolean(apiResponse.win));
-        setIsLoss(!apiResponse.win);
-      } else {
-        setMessage(apiResponse?.message || "Something went wrong");
-        setIsLoss(true);
-      }
-
-      fetchUser();
-    }, 2000);
+      const msg = err.response?.data?.message || "Play failed";
+      setMessage(msg);
+    }
   };
 
   const resultGlow =
@@ -136,7 +150,6 @@ const PlayAndWin = () => {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 p-6 space-y-12">
-
       {/* Header Section with Tokens and Unlock */}
       <div className="w-full max-w-2xl">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 p-6 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 shadow-2xl">
@@ -253,20 +266,24 @@ const PlayAndWin = () => {
 
         <motion.div whileTap={{ scale: freePlays > 0 ? 0.97 : 1 }}>
           <button
-            className={`w-full py-3 text-lg font-semibold rounded-xl shadow-lg transition-colors
-              ${
-                isUnlocked
-                  ? "bg-green-600 hover:bg-green-700 text-white"
-                  : "bg-gray-400 text-gray-200 cursor-not-allowed"
-              }`}
             onClick={handlePlay}
-            disabled={!isUnlocked}
+            disabled={!isUnlocked || remainingToday <= 0 || loading}
+            className={`w-full py-3 rounded-xl font-semibold transition
+    ${
+      isUnlocked && remainingToday > 0
+        ? "bg-green-600 hover:bg-green-700 text-white"
+        : "bg-gray-400 text-gray-200 cursor-not-allowed"
+    }`}
           >
-            {isUnlocked
-              ? loading
-                ? "Playing..."
-                : "Play Free"
-              : "Locked (No Free Plays)"}
+            {!isUnlocked ? (
+              "Locked"
+            ) : remainingToday > 0 ? (
+              `Play Free (${remainingToday} left today)`
+            ) : (
+              <span className="flex items-center justify-center gap-2">
+                ⏳ Reset in {timeLeft || "00:00:00"}
+              </span>
+            )}
           </button>
         </motion.div>
 
