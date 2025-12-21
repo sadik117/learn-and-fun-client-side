@@ -25,20 +25,20 @@ const PlayAndWin = () => {
   const slotItems = ["🍒", "🍋", "🍇", "🍊", "7️⃣", "⭐", "💎"];
 
   // Fetch user profile
- const fetchUser = async () => {
-  const res = await axiosSecure.get("/my-profile");
+  const fetchUser = async () => {
+    const res = await axiosSecure.get("/my-profile");
 
-  setFreePlays(res.data?.freePlaysLeft ?? 0);
-  setTokens(res.data?.tokens ?? 0);
-  setEmail(res.data?.email || "");
+    setFreePlays(res.data?.freePlaysLeft ?? 0);
+    setTokens(res.data?.tokens ?? 0);
+    setEmail(res.data?.email || "");
 
-  const unlock = res.data?.unlockDate
-    ? new Date(res.data.unlockDate) > new Date()
-    : false;
+    const unlock = res.data?.unlockDate
+      ? new Date(res.data.unlockDate) > new Date()
+      : false;
 
-  setUnlockDate(res.data?.unlockDate || null);
-  setIsUnlocked(unlock);
-};
+    setUnlockDate(res.data?.unlockDate || null);
+    setIsUnlocked(unlock);
+  };
 
   useEffect(() => {
     fetchUser();
@@ -115,8 +115,109 @@ const PlayAndWin = () => {
         : "ring-4 ring-red-300 shadow-[0_0_40px_rgba(239,68,68,0.25)]"
       : "";
 
+  const handleUnlock = async () => {
+    if (tokens < 4) {
+      setMessage("You need at least 4 tokens to unlock games.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await axiosSecure.post("/games/unlock", { email });
+
+      setMessage(res.data.message);
+      fetchUser();
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Unlock failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 p-6 space-y-12">
+
+      {/* Header Section with Tokens and Unlock */}
+      <div className="w-full max-w-2xl">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 p-6 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 shadow-2xl">
+          {/* Token Display - Prominent and Centered */}
+          <div className="flex-1 text-center md:text-left">
+            <div className="inline-block bg-gradient-to-r from-yellow-400 to-yellow-500 p-4 rounded-2xl shadow-lg">
+              <p className="text-sm font-semibold text-yellow-900 uppercase tracking-wider">
+                Available Tokens
+              </p>
+              <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
+                <span className="text-4xl font-bold text-yellow-900">
+                  {tokens}
+                </span>
+                <div className="w-8 h-8 rounded-full bg-yellow-300 flex items-center justify-center">
+                  <span className="text-lg font-bold text-yellow-800">T</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Unlock Button - Side by side on desktop, stacked on mobile */}
+          {!isUnlocked && (
+            <div className="flex-1 text-center md:text-right">
+              <div className="bg-gradient-to-br from-purple-600 to-pink-600 p-5 rounded-2xl shadow-xl">
+                <div className="flex items-center justify-center md:justify-end gap-2 mb-3">
+                  <span className="text-white font-semibold">
+                    🔒 Games Locked
+                  </span>
+                </div>
+                <button
+                  onClick={handleUnlock}
+                  disabled={tokens < 4 || loading}
+                  className={`w-full md:w-auto px-8 py-3 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-[1.02]
+                ${
+                  tokens >= 4
+                    ? "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl"
+                    : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                }`}
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Unlocking...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2">
+                      <span>Unlock Games</span>
+                      <span className="bg-white/20 px-2 py-1 rounded-lg">
+                        4 Tokens
+                      </span>
+                    </span>
+                  )}
+                </button>
+                <p className="text-white/80 text-sm mt-2">
+                  Unlock all games for <strong>14 days</strong>
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Status Indicator when unlocked */}
+          {isUnlocked && (
+            <div className="flex-1 text-center md:text-right">
+              <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-5 rounded-2xl shadow-lg">
+                <div className="flex items-center justify-center md:justify-end gap-2">
+                  <span className="text-2xl">🎮</span>
+                  <div>
+                    <p className="text-white font-bold text-lg">
+                      Games Unlocked!
+                    </p>
+                    {/* <p className="text-white/90 text-sm">
+                      Free plays available: {freePlays}
+                    </p> */}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -125,11 +226,6 @@ const PlayAndWin = () => {
         <h1 className="text-3xl font-extrabold text-purple-700">
           🎰 Free Lottery
         </h1>
-
-        <div className="bg-yellow-50 p-4 rounded-xl shadow-inner text-center">
-          <p className="text-gray-600">Available Tokens</p>
-          <p className="text-yellow-600 font-bold text-2xl">{tokens}</p>
-        </div>
 
         <div className="flex justify-center space-x-4 text-5xl font-bold my-6">
           {slots.map((item, i) => (
