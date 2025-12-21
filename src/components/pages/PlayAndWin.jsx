@@ -128,6 +128,7 @@ const PlayAndWin = () => {
         </h1>
 
         <div className="flex justify-center gap-4 text-5xl mb-6">
+
           {slots.map((item, i) => (
             <motion.div
               key={i}
@@ -138,17 +139,12 @@ const PlayAndWin = () => {
               {item}
             </motion.div>
           ))}
-        </div>
 
-        {isUnlocked && (
-          <p className="text-sm text-gray-500 mb-3">
-            Daily plays left: {remainingPlays}
-          </p>
-        )}
+        </div>
 
         <button
           onClick={handlePlay}
-          disabled={!isUnlocked || loading}
+          disabled={!isUnlocked || loading || spinning || remainingPlays <= 0}
           className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl disabled:bg-gray-400"
         >
           {loading ? "Playing..." : "Play"}
@@ -176,7 +172,7 @@ const PlayAndWin = () => {
           <h2 className="text-2xl font-bold">🦖 Dino Game</h2>
           <button
             onClick={() => isUnlocked && navigate("/dinogame")}
-            disabled={!isUnlocked}
+            disabled={ !isUnlocked || loading || remainingPlays <= 0 }
             className="mt-4 w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded-xl disabled:bg-gray-400"
           >
             Play Dino
