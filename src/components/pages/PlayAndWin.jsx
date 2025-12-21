@@ -255,7 +255,7 @@ const PlayAndWin = () => {
           <button
             className={`w-full py-3 text-lg font-semibold rounded-xl shadow-lg transition-colors
               ${
-                freePlays > 0
+                isUnlocked
                   ? "bg-green-600 hover:bg-green-700 text-white"
                   : "bg-gray-400 text-gray-200 cursor-not-allowed"
               }`}
@@ -303,11 +303,11 @@ const PlayAndWin = () => {
             Jump over obstacles and beat your high score — no money required!
           </p>
           <button
-            onClick={() => !isUnlocked && navigate("/dinogame")}
-            disabled={freePlays === 0}
+            onClick={() => isUnlocked && navigate("/dinogame")}
+            disabled={!isUnlocked}
             className={`w-full py-3 text-lg font-semibold rounded-xl shadow-lg transition
     ${
-      freePlays > 0
+      isUnlocked
         ? "bg-yellow-500 hover:bg-yellow-600 text-white"
         : "bg-gray-400 text-gray-200 cursor-not-allowed"
     }`}
