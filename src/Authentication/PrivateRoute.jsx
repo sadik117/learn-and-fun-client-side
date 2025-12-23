@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import Loading from "../components/layouts/Loading";
-import { Navigate, useLocation } from "react-router";
+import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 
 /*  JWT EXPIRY CHECK (NO LIB)  */

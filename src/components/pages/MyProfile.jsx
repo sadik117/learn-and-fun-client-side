@@ -6,7 +6,7 @@ import { LuCrown } from "react-icons/lu";
 import { GiCash } from "react-icons/gi";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { toast } from "react-toastify";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import useAxios from "../../hooks/useAxios";
 import { AuthContext } from "../../Authentication/AuthContext";
 

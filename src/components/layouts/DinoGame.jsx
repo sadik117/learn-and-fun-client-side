@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const PlayAndWin = () => {
   const axiosSecure = useAxiosSecure();
