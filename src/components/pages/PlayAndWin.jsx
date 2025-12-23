@@ -1,49 +1,61 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useNavigate } from "react-router";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const PlayAndWin = () => {
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
 
-  const [tokens, setTokens] = useState(0);
+  // core user state
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [tokens, setTokens] = useState(0);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+
+  // daily limits (SEPARATE)
+  const [lotteryRemaining, setLotteryRemaining] = useState(0);
+  const [dinoRemaining, setDinoRemaining] = useState(0);
+
+  // UI state
   const [loading, setLoading] = useState(false);
   const [spinning, setSpinning] = useState(false);
-  const [slots, setSlots] = useState(["❓", "❓", "❓"]);
+  const [message, setMessage] = useState("");
   const [isWin, setIsWin] = useState(false);
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [remainingPlays, setRemainingPlays] = useState(0);
 
+  // slot visuals
+  const [slots, setSlots] = useState(["❓", "❓", "❓"]);
   const slotItems = ["🍒", "🍋", "🍇", "🍊", "7️⃣", "⭐", "💎"];
 
+  // FETCH USER 
   const fetchUser = async () => {
-    const res = await axiosSecure.get("/my-profile");
-    const now = new Date();
+    try {
+      const res = await axiosSecure.get("/my-profile");
 
-    setTokens(res.data.tokens || 0);
-    setEmail(res.data.email);
+      setEmail(res.data.email);
+      setTokens(res.data.tokens || 0);
+      setIsUnlocked(res.data.isUnlocked);
 
-    const unlocked =
-      res.data.unlockDate && new Date(res.data.unlockDate) > now;
-
-    setIsUnlocked(unlocked);
+      setLotteryRemaining(res.data.lotteryRemainingPlays || 0);
+      setDinoRemaining(res.data.dinoRemainingPlays || 0);
+    } catch (err) {
+      console.error("PROFILE FETCH ERROR:", err);
+    }
   };
 
   useEffect(() => {
     fetchUser();
   }, []);
 
+  // SLOT ANIMATION 
   const randomSlots = () =>
     Array.from({ length: 3 }, () =>
       slotItems[Math.floor(Math.random() * slotItems.length)]
     );
 
+  //  LOTTERY PLAY 
   const handlePlay = async () => {
-    if (!isUnlocked || spinning || loading) return;
+    if (!isUnlocked || loading || spinning || lotteryRemaining <= 0) return;
 
     setLoading(true);
     setSpinning(true);
@@ -78,13 +90,17 @@ const PlayAndWin = () => {
 
       setSlots(response.slots);
       setIsWin(response.win);
-      setRemainingPlays(response.remainingPlays);
+      setLotteryRemaining(response.remainingPlays);
       setMessage(response.message);
     }, 2000);
   };
 
+  //  UNLOCK 
   const handleUnlock = async () => {
-    if (tokens < 4) return setMessage("You need 4 tokens to unlock.");
+    if (tokens < 4) {
+      setMessage("You need 4 tokens to unlock games.");
+      return;
+    }
 
     try {
       setLoading(true);
@@ -97,6 +113,7 @@ const PlayAndWin = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 p-6 space-y-10">
@@ -123,12 +140,15 @@ const PlayAndWin = () => {
 
       {/* SLOT MACHINE */}
       <div className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-md text-center">
-        <h1 className="text-3xl font-extrabold text-purple-700 mb-6">
+        <h1 className="text-3xl font-extrabold text-purple-700 mb-2">
           🎰 Free Lottery
         </h1>
 
-        <div className="flex justify-center gap-4 text-5xl mb-6">
+        <p className="text-sm text-gray-500 mb-4">
+          Remaining today: {lotteryRemaining}/3
+        </p>
 
+        <div className="flex justify-center gap-4 text-5xl mb-6">
           {slots.map((item, i) => (
             <motion.div
               key={i}
@@ -139,12 +159,11 @@ const PlayAndWin = () => {
               {item}
             </motion.div>
           ))}
-
         </div>
 
         <button
           onClick={handlePlay}
-          disabled={!isUnlocked || loading || spinning || remainingPlays <= 0}
+          disabled={!isUnlocked || loading || spinning || lotteryRemaining <= 0}
           className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl disabled:bg-gray-400"
         >
           {loading ? "Playing..." : "Play"}
@@ -170,10 +189,14 @@ const PlayAndWin = () => {
         />
         <div className="p-6 text-center">
           <h2 className="text-2xl font-bold">🦖 Dino Game</h2>
+          <p className="text-sm text-gray-500 mb-3">
+            Remaining today: {dinoRemaining}/3
+          </p>
+
           <button
-            onClick={() => isUnlocked && navigate("/dinogame")}
-            disabled={ !isUnlocked || loading || remainingPlays <= 0 }
-            className="mt-4 w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded-xl disabled:bg-gray-400"
+            onClick={() => navigate("/dinogame")}
+            disabled={!isUnlocked || loading || dinoRemaining <= 0}
+            className="mt-2 w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded-xl disabled:bg-gray-400"
           >
             Play Dino
           </button>
