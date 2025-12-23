@@ -83,26 +83,26 @@ const PlayAndWin = () => {
     }, 2000);
   };
 
-  // const handleUnlock = async () => {
-  //   if (tokens < 4) return setMessage("You need 4 tokens to unlock.");
+  const handleUnlock = async () => {
+    if (tokens < 4) return setMessage("You need 4 tokens to unlock.");
 
-  //   try {
-  //     setLoading(true);
-  //     const res = await axiosSecure.post("/games/unlock", { email });
-  //     setMessage(res.data.message);
-  //     fetchUser();
-  //   } catch (err) {
-  //     setMessage(err.response?.data?.message || "Unlock failed");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+    try {
+      setLoading(true);
+      const res = await axiosSecure.post("/games/unlock", { email });
+      setMessage(res.data.message);
+      fetchUser();
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Unlock failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 p-6 space-y-10">
 
       {/* TOKEN + UNLOCK */}
-      {/* <div className="bg-white/10 p-6 rounded-2xl w-full max-w-md text-center">
+      <div className="bg-white/10 p-6 rounded-2xl w-full max-w-md text-center">
         <p className="text-white font-bold text-xl">Tokens</p>
         <p className="text-yellow-300 text-4xl font-extrabold">{tokens}</p>
 
@@ -119,7 +119,7 @@ const PlayAndWin = () => {
             🎮 Games Unlocked
           </p>
         )}
-      </div> */}
+      </div>
 
       {/* SLOT MACHINE */}
       <div className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-md text-center">
