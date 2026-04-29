@@ -38,7 +38,7 @@ export default function Login() {
       toast.success("Login successful!");
       navigate(from, { replace: true });
     } catch (error) {
-      toast.error("Login failed! " + error.message);
+      toast.error("Login failed! :",  error.message);
     }
   };
 
