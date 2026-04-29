@@ -57,13 +57,17 @@ export const router = createBrowserRouter([
       {
         path: "/learn",
         element: (
+          <PrivateRoute>
             <Learn></Learn>
+          </PrivateRoute>
         ),
       },
       {
         path: "/playgames",
         element: (
+          <PrivateRoute>
             <PlayAndWin></PlayAndWin>
+          </PrivateRoute>
         ),
       },
       {
