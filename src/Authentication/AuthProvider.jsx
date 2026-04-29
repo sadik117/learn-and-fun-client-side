@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import app from "./firebase.config";
 import {
   createUserWithEmailAndPassword,
   getAuth,
-  onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
   updatePassword,
@@ -14,19 +13,6 @@ import { AuthContext } from "./AuthContext";
 
 const auth = getAuth(app);
 
-
-/* JWT EXPIRY CHECK (NO LIB)  */
-const isTokenExpired = () => {
-  const token = localStorage.getItem("access-token");
-  if (!token) return true;
-
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload.exp * 1000 < Date.now();
-  } catch {
-    return true;
-  }
-};
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -63,23 +49,6 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // AUTH STATE
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (isTokenExpired()) {
-        await signOut(auth);
-        localStorage.removeItem("access-token");
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-
-      setUser(currentUser);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
 
   const authData = {
     user,

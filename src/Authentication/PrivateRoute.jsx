@@ -3,7 +3,7 @@ import Loading from "../components/layouts/Loading";
 import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 
-/*  JWT EXPIRY CHECK (NO LIB)  */
+/*  JWT EXPIRY CHECK  */
 const isTokenExpired = () => {
   const token = localStorage.getItem("access-token");
   if (!token) return true;

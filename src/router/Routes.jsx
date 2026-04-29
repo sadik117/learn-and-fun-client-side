@@ -37,11 +37,11 @@ export const router = createBrowserRouter([
         path: "/auth",
         children: [
           {
-            path: "/auth/loginn",
+            path: "/auth/login",
             Component: Login,
           },
           {
-            path: "/auth/signupp",
+            path: "/auth/signup",
             Component: Registration,
           },
         ],
@@ -57,17 +57,13 @@ export const router = createBrowserRouter([
       {
         path: "/learn",
         element: (
-          <PrivateRoute>
             <Learn></Learn>
-          </PrivateRoute>
         ),
       },
       {
         path: "/playgames",
         element: (
-          <PrivateRoute>
             <PlayAndWin></PlayAndWin>
-          </PrivateRoute>
         ),
       },
       {
